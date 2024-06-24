@@ -14,6 +14,7 @@ unqualified-search-registries = ["registry.access.redhat.com", "registry.redhat.
 # check which images have been pulled and are available locally
 podman images
 
+# checks which images are available remotely and pull them to the local server
 podman search {container-app} | less
 podman pull {container-app}: latest
 
