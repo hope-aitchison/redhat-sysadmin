@@ -58,3 +58,60 @@ podman rm -a
 podman stop -a && podman rm -a # combined total clearout
 podmam ps -a # verify
 
+# namespaces
+# create new namespace
+podman unshare {command}
+
+## Exam style task
+# Create a container with the name mydb that runs the mariadb database as user lisa 
+# The container should automatically be started at system start - regardless of whether or not user lisa is logging in
+# 
+# The host directory /home/lisa/mydb is mounted on the container directory /var/lib/mysql 
+# The container is accessible on host port 3206
+# You do not have to create any databases in it
+
+## Solution
+
+# allow user lisa to run as a process upon system start
+sudo useradd lisa
+sudo loginctl enable-linger lisa
+sudo loginctl show-user lisa
+...
+Linger=yes
+...
+
+# make directory & install tools
+pwd
+mkdir mydb
+ls 
+
+sudo dnf install -y container-tools
+sudo dnf install -y podman
+
+ls -ld mydb # to show current ownership
+stat mydb # displays UID and GID values
+
+# change ownership in an isolated user namespace
+# necessary for rootless container set up - 27 specific to mariadb
+podman unshare chown 27:27 mydb
+
+# verify mapping
+podman unshare cat /proc/self/uid_map
+podman unshare cat /proc/self/gid_map
+
+# running the container
+podman search mariadb | less # select image to pull
+podman pull docker.io/library/mariadb:latest
+podman images # verify
+podman run -rm -it --entrypoint /bin/sh docker.io/library/mariadb # open interactive shell with the container to check filepath
+cd /var/lib/
+ls 
+
+podman run -d -p 3206:3206 --name mydb -v /home/lisa/mydb:/var/lib/mysql:Z -e MYSQL_ROOT_PASSWORD=password docker.io/library/mariadb
+podman ps -a
+
+# compare selinux settings
+ls -Z mydb
+podman exec -it mydb sh # access the container
+ls -Z /var/lib/mysql
+
