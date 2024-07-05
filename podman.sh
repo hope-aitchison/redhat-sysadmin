@@ -91,7 +91,7 @@ sudo dnf install -y podman
 ls -ld mydb # to show current ownership
 stat mydb # displays UID and GID values
 
-# change ownership in an isolated user namespace
+# change permissions / ownership in an isolated user namespace
 # necessary for rootless container set up - 27 specific to mariadb
 podman unshare chown 27:27 mydb
 
@@ -103,7 +103,7 @@ podman unshare cat /proc/self/gid_map
 podman search mariadb | less # select image to pull
 podman pull docker.io/library/mariadb:latest
 podman images # verify
-podman run -rm -it --entrypoint /bin/sh docker.io/library/mariadb # open interactive shell with the container to check filepath
+podman run --rm -it --entrypoint /bin/sh docker.io/library/mariadb # open interactive shell with the container to check filepath
 cd /var/lib/
 ls 
 
@@ -115,3 +115,52 @@ ls -Z mydb
 podman exec -it mydb sh # access the container
 ls -Z /var/lib/mysql
 
+# create a systemd service file for mydb
+mkdir -p .config/systemd/user/
+cd .config/systemd/user/
+podman generate systemd --name mydb --files --new
+ls 
+container-mydb.service
+
+# enable this new service so that it is registered with systemd
+systemctl --user daemon-reload
+systemctl --user enable container-mydb.service
+# Created symlink /home/lisa/.config/systemd/user/default.target.wants/container-mydb.service → /home/lisa/.config/systemd/user/container-mydb.service.
+
+# reboot the host server
+
+sudo -i
+ps faux | less
+/lisa
+# check for a child of the conmon main process with mariadb declared - proof this is working!
+
+## note podman generate systemd is now DEPRECATED
+# quadlet files for root user 
+/etc/containers/systemd/
+/usr/share/containers/systemd/
+
+# quadlet files for non-root users
+~/.config/containers/systemd/
+/etc/containers/systemd/users/$(UID)
+/etc/containers/systemd/users/
+
+# create a mydb.container unit file
+cat ~/.config/containers/systemd/mydb.container
+
+####
+[Unit]
+Description=The mariadb container
+After=local-fs.target
+
+[Container]
+Image=docker.io/library/mariadb:latest
+Exec=
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target
+
+systemctl --user daemon-reload
+systemctl --user enable container-mydb.service
+
+# note: could not get this to work on RHEL9.4 EC2 instance using Red Hat documentation
