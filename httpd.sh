@@ -25,6 +25,7 @@ vim index.html
 hello and welcome to my world
 
 chmod o+r index.html # must be readable by others
+systemctl restart httpd
 curl http://localhost # works
 
 # make umask global for all users
