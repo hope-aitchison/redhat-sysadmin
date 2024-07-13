@@ -17,4 +17,3 @@ Source targets:
 - files & directories  
 - ports  
 When files are created within a directory they inherit the context of the parent directory - and same if a file is copied. But if a file is moved into a different directory, then it retains the original context.  
-
