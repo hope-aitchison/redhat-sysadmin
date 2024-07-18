@@ -27,10 +27,10 @@ ctrl^x
 
 # managing context labels
 semanage fcontext 
-semanage fcontext
 
 # see manual pages for examples
 man semanage-fcontext
+
 
 ############################################
 ## basic relabelling example
@@ -119,3 +119,21 @@ man -k _selinux # shows all pages available
 man -k _selinux | grep httpd # specifically searches for anything httpd related (see above example)
 
 man httpd_selinux # search for the context label
+
+# check what the expected selinux label of a file should be
+matchpathcon /path/to/file 
+
+# location of all default file policies
+/etc/selinux/targeted/contexts/files/file_contexts
+
+#####################################
+## SELinux port context labels
+
+# check expected / default port label 
+semanage port -l | grep 22
+
+# search in augit logs for anything related
+grep AVC /var/log/audit/audit.log | grep sshd
+
+# update a port to use a new label
+semanage port -a -t ssh_port_t -p tcp 2202

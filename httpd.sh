@@ -30,3 +30,6 @@ curl http://localhost # works
 
 # make umask global for all users
 echo 'umask 0022' | sudo tee -a /etc/profile
+
+# check which services are using which ports
+ss -tunap
