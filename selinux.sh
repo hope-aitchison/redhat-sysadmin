@@ -133,7 +133,25 @@ matchpathcon /path/to/file
 semanage port -l | grep 22
 
 # search in augit logs for anything related
-grep AVC /var/log/audit/audit.log | grep sshd
+grep AVC /var/log/audit/audit.log | grep sshd # selinux uses auditd for logging
 
 # update a port to use a new label
 semanage port -a -t ssh_port_t -p tcp 2202
+
+#####################################
+## SELinux booleans
+
+# Overview of all booleans
+semanage boolean -l
+getsebool -a
+
+# to change booleans
+setsebool -P boolean-name on/off # P for persistent
+
+# check for non default settings
+semanage boolean -l -C
+
+# example
+getsetbool -a | grep ftp
+setsebool -P ftpd_anon_write on
+semanage boolean -l -C
