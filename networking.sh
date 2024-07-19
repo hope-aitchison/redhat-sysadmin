@@ -1,7 +1,10 @@
 #!/bin/bash
 
+#######################################
+## firewalld & NFS
+
 dnf install -y firewalld
-dnf install -y nfs-utils
+dnf install -y nfs-utils autofs
 
 sudo -i
 vim /etc/exports # NFS configuration
@@ -11,9 +14,17 @@ systemctl enable nfs-server
 # Created symlink /etc/systemd/system/multi-user.target.wants/nfs-server.service → /usr/lib/systemd/system/nfs-server.service
 systemctl start nfs-server
 
+
 sudo firewall-cmd --state
 systemctl start firewalld
 sudo firewall-cmd --reload
+
+## example http
+firewall-cmd --list-all
+firewall-cmd --get-services 
+firewall-cmd --get-services | grep http
+firewall-cmd --add service http --permanent
+firewall-cmd --reload
 
 sudo -i
 for x in rpc-bind mountd nfs; do firewall-cmd --add-service $x --permanent; done
@@ -68,5 +79,17 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-services
 # cockpit dhcpv6-client mountd nfs rpc-bind ssh
 
-sudo dnf install -y nfs-utils autofs
+
+#######################################
+## port activity with ss
+
+ss # socket statistics
+ss -tu
+ss -tua
+ss -tln
+ss -tulpn
+
+# check which services are using which ports
+ss -tunap
+
 
