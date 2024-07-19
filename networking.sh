@@ -68,4 +68,5 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-services
 # cockpit dhcpv6-client mountd nfs rpc-bind ssh
 
+sudo dnf install -y nfs-utils autofs
 
