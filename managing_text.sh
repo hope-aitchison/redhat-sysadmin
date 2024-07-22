@@ -133,6 +133,18 @@ ls -l | awk '{print $9, $5}' # prints file / directory name and its size
 
 df -h | awk '$NF=="/"{print $5}' # prints disk usage percentage of partition mounted on /
 
+free -m | awk 'NR==2{ print $3 }' # prints the available memory in mb
 
 
+#######################################
+## SED
 
+# stream editor for filtering and transforming text
+# text transformations on an input stream e.g. a file or input from a pipeline
+
+sed -n 5p /etc/passwd # prints line 5
+
+sed -i s/old/new/g file.txt # swaps "old" for "new" globally
+# /g globally -i interactive
+
+sed -i -e '4d' users.txt # removes the 4th line from a file
