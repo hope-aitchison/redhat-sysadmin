@@ -40,8 +40,12 @@ vim AppStream.repo
 name=AppStream
 baseurl=file:///repo/AppStream
 enabled=1
-gpgcheck=0
+gpgcheck=0 # this set to 1 can cause issues in downloading packages
 
 cp AppStream.repo BaseOS.repo # update the name, baseurl
 
+dnf repolist # check which repos are available locally
+
 dnf install -y nmap # check all working as expected
+
+dnf search all seinfo # deep search for a package
