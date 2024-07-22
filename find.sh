@@ -9,6 +9,7 @@ only looks for exact matches
 which
 man which
 which - shows the full path of (shell) commands
+which passwd # shows binary location of passwd command
 
 find / -name "hosts"
 # /etc/hosts
