@@ -244,3 +244,7 @@ nvme1n1             259:5    0   10G  0 disk
 └─nvme1n1p2         259:7    0    1G  0 part
   └─vgfiles-lvfiles 253:0    0  1.5G  0 lvm  /mnt
 
+#######################################
+## Reducing volume groups
+# there needs to be available extents in the VG PV pool to remove a PV
+
