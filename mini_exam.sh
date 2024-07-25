@@ -122,4 +122,3 @@ tuned-adm profile virtual-guest
 
 tuned-adm active
 # virtual guest
-
