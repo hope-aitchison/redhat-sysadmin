@@ -257,18 +257,80 @@ lsblk -f # final verification
 
 #########################################################################################
 
-Create user bob and set this user’s shell so that this user can only change the password //
+Create user bob and set this users shell so that this user can only change the password //
 and cannot do anything else.
 
+useradd bob
 
+cd /usr/local/bin/
+vim bob_password_shell.sh
+
+#!/bin/bash
+echo "Change your password Bob!"
+exec /usr/bin/passwd
+
+chmod +x bob_password_shell.sh # make sure it is executable
+
+vim /etc/passwd
+# edit bob's entry:
+bob:x:2003:2005::/home/bob:/usr/local/bin/bob_passwd_shell.sh
+
+su - bob
+Change your password Bob!
+Changing password for user bob.
+
+#########################################################################################
 
 Install the vsftpd service and ensure that it is started automatically at reboot.
 
+dnf install -y vsftpd
+systemctl enable vsftpd # this step means it starts on reboot
+systemctl start vsftpd
+
+dnf install -y firewalld
+systemctl enable firewalld
+systemctl start firewalld
+
+firewall-cmd --get-services | grep ftp
+
+firewall-cmd --add-service ftp --permanent
+firewall-cmd --reload
+
+
+#########################################################################################
+
+
 Create a container that runs an HTTP server. Ensure that it mounts the host directory //
 /httproot on the directory /var/www/html.
-
 Configure this container such that it is automatically started on system boot as a //
 system user service.
+
+dnf install -y podman
+dnf install -y container-tools
+
+mkdir /httproot
+
+podman search http | less
+# select an image
+
+podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7:latest
+
+podman run --rm -it --entrypoint /bin/sh registry.access.redhat.com/rhscl/httpd-24-rhel7
+cd /var/www/html # confirm directory present
+
+podman run -d -p 80:80 --name http_server -v /httproot:/var/www/html:Z registry.access.redhat.com/rhscl/httpd-24-rhel7
+
+podman ps -a # confirm its running
+
+cd /etc/systemd/system/
+podman generate systemd --name http_server --files --new
+ls 
+container-http_server.service
+
+systemctl start container-http_server.service
+systemctl enable container-http_server.service # should now start on boot
+
+#########################################################################################
 
 Create a directory with the name /users and ensure it contains the subdirectories //
 linda and anna. Export this directory by using an NFS server.
@@ -276,3 +338,48 @@ linda and anna. Export this directory by using an NFS server.
 Create users linda and anna and set their home directories to /home/users/linda and //
 /home/users/anna. Make sure that while these users access their home directory, //
 autofs is used to mount the NFS shares /users/linda and /users/anna from the same server.
+
+mkdir /users
+cd /users
+mkdir linda
+mkdir anna
+ls
+
+dnf install -y nfs-utils
+
+systemctl start nfs-server
+systemctl enable nfs-server
+
+vim /etc/exports
+/users      *(rw,no_root_squash)
+
+exportfs -r 
+exportfs -v # verify
+
+
+systemctl status firewalld
+for i in rpc-bind mountd nfs; do firewall-cmd --add-services $i //
+--permanent ; done
+
+firewall-cmd --reload
+firewall-cmd --list-services
+
+useradd -d /home/users/linda -m linda
+useradd -d /home/users/anna -m anna
+
+dnf install -y autofs
+vim /etc/auto.master
+
+/home/users     /etc/auto.user
+
+linda -rw localhost:/users/linda
+anna  -rw localhost:/users/anna
+# replace localhost with nfsserver hostname or IP
+
+systemctl enable --now autofs
+systemctl start autofs
+
+cd /home/users
+# empty...
+cd linda
+# works!
