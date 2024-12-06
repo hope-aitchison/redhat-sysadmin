@@ -68,3 +68,10 @@ chmod 070 /data/profs
 
 
 ### Finding files
+## find all files with a size bigger than 100MiB
+## write a long listing of these files to /tmp/bigfiles
+## perform a command on the result of the find command
+-exec command {} \;
+awk # to be used in place of grep
+
+find / -type f -size +100M -exec ls -ld {} \; >/tmp/bigfiles 
