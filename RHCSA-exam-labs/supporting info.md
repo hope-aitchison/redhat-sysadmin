@@ -35,3 +35,17 @@ rpm -qa | grep vim
 sudo dnf info vim-enhanced
 Check how a package is installed and under which name
 Queries the rpm database
+
+### Looping constructs
+The for statement is used to evaluate range of items
+Good for evaluating multiples files, arguments, usernames, etc
+To remove a part from a string, matching operators can be used:
+* ${name##*/} removes the longest match of the pattern */ from the left side
+* ${name#*/} removes the shortest match of the pattern */ from the left side
+* ${name%/*} removes the shortest match of the pattern /* from the right side
+* ${name%%/*} removes the longest match of the pattern /* from the right side
+To create a range of items in one command, put the items between {}
+
+### Parameter expansion
+In Bash, the ${VAR%PATTERN} syntax is part of parameter expansion, //
+and it allows you to manipulate text within variables.
