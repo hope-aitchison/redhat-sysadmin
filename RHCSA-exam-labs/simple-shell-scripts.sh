@@ -34,10 +34,48 @@ touch /tmp/testfile{1..9}.txt
 echo what directory?
 read DIR
 
-for i in ${DIR}/*.txt; do 
-        SHORTNAME=${i%.txt}
-        BACKUP="${SHORTNAME}.bak"
-        echo the shortname is $SHORTNAME
+echo "which directory are you in currently?"
+read DIR
+echo "we are creating backup files in $DIR"
+
+for i in ${DIR}/*.txt; do
+
+        NO_EXT=${i%.txt}
+        BACKUP=${NO_EXT}.bak
+        echo $i to be saved as $BACKUP
         mv $i $BACKUP
-        echo the backup file is $BACKUP
 done
+
+## parameter expansion
+
+${VAR%PATTERN} - Remove the shortest match of PATTERN from the end
+${VAR%%PATTERN} - Remove the longest match of PATTERN from the end
+${VAR#PATTERN} - Remove the shortest match of PATTERN from the beginning
+${VAR##PATTERN} - Remove the longest match of PATTERN from the beginning
+
+# shortest match from end
+FILENAME="file.txt.bak"
+NO_EXT=${FILENAME%.txt.bak}
+echo "$NO_EXT"
+file
+
+FULLPATH="dir/subdir/file.txt"
+DIR=${FULLPATH%/*}
+echo "$DIR"
+dir/subdir
+
+OLDNAME="file.txt"
+NEWNAME=${OLDNAME%.txt}.bak
+echo "$NEWNAME"
+file.bak
+
+# longest match from the beginning
+FILENAME="document.pdf"
+EXT=${FILENAME##*.}
+echo "$EXT"
+pdf
+
+FULLPATH="dir/subdir/file.txt"
+FILENAME=${FULLPATH##*/}
+echo FILENAME
+file.txt

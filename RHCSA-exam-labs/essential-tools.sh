@@ -48,7 +48,7 @@ dnf install -y git # verifies that we can now install packages from
 
 ## make a directory /data/profs
 ## create a group profs
-## create a user linda and add to the group profs
+## create a user linda
 ## configure permissions so that linda can not read or write files in /data/profs
 ## allow linda ability to changes permissions on /data/profs directory
 ## members of profs should be allowed to read and write in /data/profs
@@ -66,11 +66,12 @@ linda id
 chown linda:profs /data/profs
 chmod 070 /data/profs
 
+# by making linda the owner, the user can change permissions on the directory
+
 
 ### Finding files
 ## find all files with a size bigger than 100MiB
-## write a long listing of these files to /tmp/bigfiles
-## perform a command on the result of the find command
+t## perform a command on the result of the find command
 -exec command {} \;
 awk # to be used in place of grep
 
