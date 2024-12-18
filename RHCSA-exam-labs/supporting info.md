@@ -49,3 +49,44 @@ To create a range of items in one command, put the items between {}
 ### Parameter expansion
 In Bash, the ${VAR%PATTERN} syntax is part of parameter expansion, //
 and it allows you to manipulate text within variables.
+
+## parameter expansion
+
+${VAR%PATTERN} - Remove the shortest match of PATTERN from the end
+${VAR%%PATTERN} - Remove the longest match of PATTERN from the end
+${VAR#PATTERN} - Remove the shortest match of PATTERN from the beginning
+${VAR##PATTERN} - Remove the longest match of PATTERN from the beginning
+
+# shortest match from end
+FILENAME="file.txt.bak"
+NO_EXT=${FILENAME%.txt.bak}
+echo "$NO_EXT"
+file
+
+FULLPATH="dir/subdir/file.txt"
+DIR=${FULLPATH%/*}
+echo "$DIR"
+dir/subdir
+
+OLDNAME="file.txt"
+NEWNAME=${OLDNAME%.txt}.bak
+echo "$NEWNAME"
+file.bak
+
+# longest match from the beginning
+FILENAME="document.pdf"
+EXT=${FILENAME##*.}
+echo "$EXT"
+pdf
+
+FULLPATH="dir/subdir/file.txt"
+FILENAME=${FULLPATH##*/}
+echo FILENAME
+file.txt
+
+## Conditionally executing code
+if...then...else...fi is the basic strucute for conditionally executing code
+To refer to one command line argument, use $1
+To refer to an unknown number of command line arguments, use $@ in a while loop
+Use read to prompt users for input and store them as an input variable
+

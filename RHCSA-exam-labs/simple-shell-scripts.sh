@@ -31,8 +31,6 @@ done
 touch /tmp/testfile{1..9}.txt
 
 #!/bin/bash
-echo what directory?
-read DIR
 
 echo "which directory are you in currently?"
 read DIR
@@ -46,36 +44,75 @@ for i in ${DIR}/*.txt; do
         mv $i $BACKUP
 done
 
-## parameter expansion
+### Conditionally executing code
 
-${VAR%PATTERN} - Remove the shortest match of PATTERN from the end
-${VAR%%PATTERN} - Remove the longest match of PATTERN from the end
-${VAR#PATTERN} - Remove the shortest match of PATTERN from the beginning
-${VAR##PATTERN} - Remove the longest match of PATTERN from the beginning
+## Write a script with the name /root/lab52.sh that checks if a user exists.
+## If it exists, the script should print the login shell for that user. 
+## If not, the script prints that the user does not exist
+## Ensure script allows providing the user name as a CL argument
+## if no user name provided, prompt for it
+## should be able to work with multiple user names if provided
 
-# shortest match from end
-FILENAME="file.txt.bak"
-NO_EXT=${FILENAME%.txt.bak}
-echo "$NO_EXT"
-file
+#!/bin/bash
 
-FULLPATH="dir/subdir/file.txt"
-DIR=${FULLPATH%/*}
-echo "$DIR"
-dir/subdir
+echo which user should I check exists?
 
-OLDNAME="file.txt"
-NEWNAME=${OLDNAME%.txt}.bak
-echo "$NEWNAME"
-file.bak
+# first check if the usernames are passed in
 
-# longest match from the beginning
-FILENAME="document.pdf"
-EXT=${FILENAME##*.}
-echo "$EXT"
-pdf
+if [[ $# -eq 0 ]]; then
+        echo "No users provided, please input users"
+        read USERS
+else
+        USERS=$@
+fi
 
-FULLPATH="dir/subdir/file.txt"
-FILENAME=${FULLPATH##*/}
-echo FILENAME
-file.txt
+# this method checks if the number of arguments is 0
+# this is saying "are the number of arguments 0" so slightly more explicit
+
+# another format
+
+if [[ -z $1 ]]; then
+        echo "No users provided, please input users"
+        read USERS
+else
+        USERS=$@
+fi
+
+# this method checks if the first positional parameter ($1) is empty
+# if $1 is empty it implies no argumentd were passed into the script
+# essentially this is saying "if zero at argument1"
+
+# $@ special variable that represents all positional arguments passed to the script
+# treats each arguments as separate strings
+# $* treats all arguments as a single string
+
+# test test
+
+if [[ $# -eq 0 ]]; then
+        echo "No users provided, please input users"
+        read USERS
+else
+        USERS=$@
+fi
+
+echo print each user
+
+for i in $USERS; do
+        echo $i
+done
+
+
+## final scripy
+
+if [[ $# -eq 0 ]]; then
+        echo "No users provided, please input users"
+        read USERS
+else
+        USERS=$@
+fi
+
+echo print each existing user login shell
+
+for i in $USERS; do
+        grep -q $i /etc/passwd && echo "user $i uses the shell $(grep $i /etc/passwd | awk -F : '{ print $NF }'" || echo "$i user does not exist"
+done
