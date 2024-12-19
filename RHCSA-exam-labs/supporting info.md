@@ -90,3 +90,12 @@ To refer to one command line argument, use $1
 To refer to an unknown number of command line arguments, use $@ in a while loop
 Use read to prompt users for input and store them as an input variable
 
+
+## Systemd
+Unit files in systemd can be configured with many directives
+List all directives using systemctl show
+
+## Tuning
+The linux kernel can be tweaked by modifying parameters in the /proc/sys directory
+Persistent modifications should be made in /etc/sysctl.conf file or /etc/sysctl.conf.d/
+Tuned comes with predefined performance profiles that match specific workloads
