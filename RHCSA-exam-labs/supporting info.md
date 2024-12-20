@@ -99,3 +99,40 @@ List all directives using systemctl show
 The linux kernel can be tweaked by modifying parameters in the /proc/sys directory
 Persistent modifications should be made in /etc/sysctl.conf file or /etc/sysctl.conf.d/
 Tuned comes with predefined performance profiles that match specific workloads
+
+## MBR vs GPT
+MBR = master boot record
+GPT = GUID partition table
+MBR is limited up to 2 TiB, due to 32 bit address space. 
+MBR supports 4 primary partitions (if one is an extended partition). The 4th extended partition can then  
+handle multiple logical partitions.
+MBR stores the partition table in a single location (first 512 bytes on disk)
+GPT supports disk sizes of higher than 2 TiB.
+GPT can handle up to 128 partitions, no need for extended or logical partitions.
+GPT stores a primary partition table at the beginning of the disk space, and a backup copy at the end  
+of the disk space.
+
+vfat filesystem is compatible with Linux, Windows, MacOS, i.e. very compatible.  
+It does not support labels.
+
+Check which partitioning scheme is in use:
+```
+parted /dev/disk print
+fdisk -l
+```
+To show current labels and UUID for formatted devices
+```
+blkid
+```
+print the UUID to fstab
+```
+lsblk -o +UUID | grep nvme1n1p5 | awk '{ print $NF }' >> /etc/fstab
+```
+
+## Logical volumes
+* LVM logical volumes are allocated from a volume group
+* the vg is composed of one or more physical volumes, which represent available block devices
+* If a partition is used as a pv, it should be marked with the lvm partition type
+* you state the physical extent size when creating the volume group
+* the pe is the minimum amount to be allocated from the volume group
+* each vg uses one pe to store metadata (i.e there is always one held back)
