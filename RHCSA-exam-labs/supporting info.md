@@ -136,3 +136,9 @@ lsblk -o +UUID | grep nvme1n1p5 | awk '{ print $NF }' >> /etc/fstab
 * you state the physical extent size when creating the volume group
 * the pe is the minimum amount to be allocated from the volume group
 * each vg uses one pe to store metadata (i.e there is always one held back)
+
+## Swap memory
+Swap memory makes working with Linux more efficient
+Unused application memory can be moved to swap
+Swap can be allocated on a block device or on a swap file  
+Create a file with the dd utility - then it can be used as any other swap device
