@@ -1,6 +1,6 @@
-## Supporting info
+# Supporting info
 
-### Configuring remote repository access
+## Configuring remote repository access
 * Without access to repositories a RHEL server cannot install software
 * Registered RHEL servers have access to the Red Hat repositories
 * All severs are offline for the exam - no repository access
@@ -10,7 +10,7 @@
 
 GPG = GNU Privacy Guard - ensures authenticity of the packages in a repository. 
 
-### Configuring local repository access
+## Configuring local repository access
 * To create an ISO file, use the dd command
 * To mount it persistently, add a line to /etc/fstab and use the iso9660 fs type
 * Use dnf config-manager --add-repo or manually add a repository file to the /etc/yum.repos.d/ directory
@@ -36,7 +36,7 @@ sudo dnf info vim-enhanced
 Check how a package is installed and under which name
 Queries the rpm database
 
-### Looping constructs
+## Looping constructs
 The for statement is used to evaluate range of items
 Good for evaluating multiples files, arguments, usernames, etc
 To remove a part from a string, matching operators can be used:
@@ -46,18 +46,16 @@ To remove a part from a string, matching operators can be used:
 * ${name%%/*} removes the longest match of the pattern /* from the right side
 To create a range of items in one command, put the items between {}
 
-### Parameter expansion
+## Parameter expansion
 In Bash, the ${VAR%PATTERN} syntax is part of parameter expansion, //
 and it allows you to manipulate text within variables.
-
-## parameter expansion
 
 ${VAR%PATTERN} - Remove the shortest match of PATTERN from the end
 ${VAR%%PATTERN} - Remove the longest match of PATTERN from the end
 ${VAR#PATTERN} - Remove the shortest match of PATTERN from the beginning
 ${VAR##PATTERN} - Remove the longest match of PATTERN from the beginning
 
-# shortest match from end
+### shortest match from end
 FILENAME="file.txt.bak"
 NO_EXT=${FILENAME%.txt.bak}
 echo "$NO_EXT"
@@ -73,7 +71,7 @@ NEWNAME=${OLDNAME%.txt}.bak
 echo "$NEWNAME"
 file.bak
 
-# longest match from the beginning
+### longest match from the beginning
 FILENAME="document.pdf"
 EXT=${FILENAME##*.}
 echo "$EXT"
@@ -142,3 +140,45 @@ Swap memory makes working with Linux more efficient
 Unused application memory can be moved to swap
 Swap can be allocated on a block device or on a swap file  
 Create a file with the dd utility - then it can be used as any other swap device
+
+## Mounting filesystems
+Specific mounting settings can be written into the /etc/fstab file
+defaults = rw, suid, dev, exec, auto, nouser, async
+### General
+ro - mount the fs as read only
+sync - writes are done synchronously
+### Access control
+nosuid - disables set user identifier and set group identifier bits for programmes
+nodev - disables interpretation of device files
+noexec - prevents execution of binaries on the fs
+user / nouser - allows non-root user / root user only to mount the fs
+### Performance optimisation
+noatime - disables atime updates
+relatime - updates atime only if previous atime is older than last modification time (mtime)
+nodiratime - disables directory atime updates
+
+## Autofs
+Automatic mounting and unmounting of filesystems on demand.  
+Useful for managing NFS (network shares) or local filesystems that are not always needed.  
+Means these filesystems are mounted when accessed, and unmounted when idle.  
+* autofs utilises the automount daemon
+* after period of inactivity autofs unmounts the filesystem
+* relies on master map file
+* default timeout is 5 minutes, set TIMEOUT=N for global changes in /etc/sysconfig/autofs
+* set --timeout=n in /etc/auto.master
+
+## Resizing LVM volumes
+To grow the size of a logical volume, free extents must be available in the vg
+If no free extents are available, additional extents can be allocated by adding physical volumes  
+to the volume group.  
+While resizing the logical volume you should always use the -r option to resize  
+the filesystem as well.
+* xfs can only be extended
+* ext4 can be extended or reduced
+
+## Configuring directories for collaboration
+Anything to do with collaboration will be aligned with Special Permissions.  
+* Set group-ID ensures that all files created within a directory will be group-owned.  
+* Sticky bit - if applied to a directory, guarentees that only the user that created the file  
+will be able to delete the file.
+
