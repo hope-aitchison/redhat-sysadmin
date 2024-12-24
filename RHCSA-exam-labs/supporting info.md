@@ -182,3 +182,12 @@ Anything to do with collaboration will be aligned with Special Permissions.
 * Sticky bit - if applied to a directory, guarentees that only the user that created the file  
 will be able to delete the file.
 
+## Scheduling tasks
+cron jobs and systemd timers are not connected to the STDOUT so commands like echo  
+are not suitable.
+
+## Configuring time services
+While booting, linux obtains its time from the hardware clock, and sets system clock.  
+Continued time synchronisation is achieved by fetching internet time, using the chronyd service.
+
+
