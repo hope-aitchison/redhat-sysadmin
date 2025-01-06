@@ -190,4 +190,12 @@ are not suitable.
 While booting, linux obtains its time from the hardware clock, and sets system clock.  
 Continued time synchronisation is achieved by fetching internet time, using the chronyd service.
 
+## Hostname resolution
+In connected network environments, hostname resolution is provided by DNS.  
+To configure a DNS client the etc/resolv.conf is used.  
+If no DNS is available, then /etc/hosts is used.  
+/etc/nsswitch.conf file is used to configure the order in which these files are used.  
+In this file there is a line:  
+hosts:      files dns myhostname  
+This is the hierarchy, so anything within /etc/hosts takes precedence.
 
