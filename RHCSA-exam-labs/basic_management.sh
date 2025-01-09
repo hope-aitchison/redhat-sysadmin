@@ -29,5 +29,3 @@ IP address      examlabs.local # ensure hostname resolves to correct IP address
 :wq
 
 ping examlabs.local
-
-

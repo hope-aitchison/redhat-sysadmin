@@ -199,3 +199,7 @@ In this file there is a line:
 hosts:      files dns myhostname  
 This is the hierarchy, so anything within /etc/hosts takes precedence.
 
+## Groups & user management
+When creating a Linux user a group is created with the same name as the user.  
+This is the primary group. The secondary group is created and configured separately.  
+Default settings are in /etc/login.defs.   
