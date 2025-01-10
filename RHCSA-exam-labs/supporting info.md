@@ -208,3 +208,20 @@ passwd command allows for password expiration settings but less overall control.
 
 ## Super user access
 visudo command opens up the /etc/sudoers file, which contains examples.  
+
+## Permissions
+When finding a match Linux looks no further.  
+Special permissions = sticky bit. Means group members can only delete files they have created.  
+Sticky bit is achieved using chmod u/g/o+t dir/.  
+All files created in directory with a group id, inherit the group owner of the directory.  
+Group ID is achieved using chmod g+s dir/.  
+Attributes can be used to prevent file operations regardless of permissions set.  
+Default permission mode = 755  
+
+## Sticky bit
+Applies at the directory level and prevents all users from deleting or renaming files, unless  
+they own them. Example:  
+* group staff members given full permissions to a directory
+* without sticky bit any member of staff group can delete or rename any file in that directory
+* applying sticky bit means only file owners can delete / rename files, regardless of group membership  
+Visually appears under "others" but its behaviour impacts all users.
