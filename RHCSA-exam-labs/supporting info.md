@@ -225,3 +225,12 @@ they own them. Example:
 * without sticky bit any member of staff group can delete or rename any file in that directory
 * applying sticky bit means only file owners can delete / rename files, regardless of group membership  
 Visually appears under "others" but its behaviour impacts all users.
+
+## SELinux
+On exam, your system must be configured with SELinux in enforcing mode.  
+File context is used for access to files and directories.  
+Use man semanage-fcontext for useful examples.  
+Booleans are on / off switches used to enable or disable specific functionality.  
+If sealert is available, it can be used to print interpreted messages about SELinux details.  
+restorecon is for file context relabelling only - due to the file inode.  
+
