@@ -234,3 +234,16 @@ Booleans are on / off switches used to enable or disable specific functionality.
 If sealert is available, it can be used to print interpreted messages about SELinux details.  
 restorecon is for file context relabelling only - due to the file inode.  
 
+
+## Managing containers
+Rootless containers are more secure, but in some cases cannot be used.  
+Rootless containers do not have full access to the filesystem, & they cannot bind to a host port  
+that is privileged.  
+Privileged ports = ports below 1024.   
+Each user account that needs access to container registries, needs to authenticate on  
+the registries. If you have multiple users running containers, they will all need to authenticate.  
+man podman-run for an overview.  
+RedHat registries:  
+* registry.redhat.io: Official Red Hat container registry for certified images.
+* registry.access.redhat.com: Deprecated but may still be present.
+* docker.io: Used to access Docker Hub if configured.
