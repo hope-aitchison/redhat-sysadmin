@@ -247,3 +247,8 @@ RedHat registries:
 * registry.redhat.io: Official Red Hat container registry for certified images.
 * registry.access.redhat.com: Deprecated but may still be present.
 * docker.io: Used to access Docker Hub if configured.
+
+## Running containers in the background with systemd
+If a container is required to start in the background, enable lingering to ensure a user's systemd  
+services (including pdoman-managed containers) persist after that user logs out.  
+
