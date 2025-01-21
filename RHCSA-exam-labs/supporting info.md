@@ -251,4 +251,16 @@ RedHat registries:
 ## Running containers in the background with systemd
 If a container is required to start in the background, enable lingering to ensure a user's systemd  
 services (including pdoman-managed containers) persist after that user logs out.  
+If you start a container as "sudo" this container belongs to root. If you run the container whilst  
+logged in as a user, then it belongs to that user. 
+
+## Mounting a host directory to a container directory
+The SELinux file context will need to be updated (to contailer_file_t).  
+The permissions for the directory should be permissive (777).  
+For best security change the ownership of the directory.  
+* When you mount a host directory the process inside the container must have write permissions.  
+* * E.g. In a MariaDB container the process that runs the db operates as UID 27 which corresponds  
+    to the mysql user inside the container
+* Inspect the service UID running inside the container and change host directory ownership accordingly  
+
 
