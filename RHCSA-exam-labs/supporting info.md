@@ -263,4 +263,21 @@ For best security change the ownership of the directory.
     to the mysql user inside the container
 * Inspect the service UID running inside the container and change host directory ownership accordingly  
 
+## Rootless podman
+When running a rootless container via podman, do not run the command using :Z as this prompts an selinux  
+relabelling. :Z applies SELinux labels to the mounted volume, which causes permission issues when it is  
+not run via root user. Without the :Z argument, podman does not try and apply any SELinux labels, and the  
+mounted volume will inherit the labels of the host.
+
+## ssh login non-root user 
+When working with containers it is recommended to login to a user session using ssh rather than su.  
+ssh logs in via a real login shell, whereas su does not.
+
+## User namespaces
+Rootless podman uses user namespaces to allow non-root users to run containers with their own isolated  
+filesystem, process, and network environments. 
+podman unshare - allows you to interact with this unprivileged container environment. It lets you inspect the  
+filesystem and permissions as they appear inside the container (may differ to those on the host).  
+User - allows uses to run containers without root privileges by mapping container UIDs to host unprivileged UIDs.  
+
 

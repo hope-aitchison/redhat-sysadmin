@@ -62,37 +62,9 @@ Relabeled /home/linda/mydb from unconfined_u:object_r:user_home_t:s0 to system_u
 podman run --rm registry.redhat.io/rhel9/mariadb-105 id mysql
 uid=27(mysql) gid=27(mysql) groups=27(mysql),0(root)
 
-chown 27:27 /home/linda/mydb
+# rootless container so run user namespace
+podman unshare chown 27:27 /home/linda/mydb 
 chmod 777 /home/linda/mydb
-
-# activate user linda to allow container to run in background
-sudo loginctl enable-linger linda
-sudo loginctl user-status linda
-linda (1002)
-           Since: Tue 2025-01-21 12:49:01 UTC; 2s ago
-           State: lingering
-          Linger: yes
-            Unit: user-1002.slice
-                  └─user@1002.service
-                    └─init.scope
-                      ├─19289 /usr/lib/systemd/systemd --user
-                      └─19291 "(sd-pam)"
-
-sudo loginctl show-user linda
-UID=1002
-GID=1002
-Name=linda
-Timestamp=Tue 2025-01-21 12:49:01 UTC
-TimestampMonotonic=8961521404
-RuntimePath=/run/user/1002
-Service=user@1002.service
-Slice=user-1002.slice
-State=lingering
-Sessions=
-IdleHint=yes
-IdleSinceHint=0
-IdleSinceHintMonotonic=0
-Linger=yes
 
 # login to redhat registry and pull container
 cat /etc/containers/registries.conf
@@ -109,6 +81,11 @@ podman -d --name mariadb -v /home/linda/mydb:/var/lib/mysql:Z -e MYSQL_ROOT_PASS
 
 CONTAINER ID  IMAGE                                        COMMAND     CREATED         STATUS                 PORTS       NAMES
 d6994353b063  registry.redhat.io/rhel9/mariadb-105:latest  run-mysqld  56 seconds ago  Up Less than a second  3306/tcp    mariadb
+
+podman inspect mariadb
+
+cd mydb
+data  mysql.sock
 
 
 ## Using containerfile
