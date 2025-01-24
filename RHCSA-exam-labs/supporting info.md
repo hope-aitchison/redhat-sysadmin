@@ -280,4 +280,9 @@ podman unshare - allows you to interact with this unprivileged container environ
 filesystem and permissions as they appear inside the container (may differ to those on the host).  
 User - allows uses to run containers without root privileges by mapping container UIDs to host unprivileged UIDs.  
 
-
+## podman systemd integration
+podman generate command is used to generate systemd unit files from running containers.  
+Use man podman-generate-systemd for usage information.  
+When running podman generate make sure you are in the directory ~/.config/systemd/user
+To start the container at system boot, without having the user logging in, the linger feature needs to be  
+enabled for this user, using loginctl enable-linger user.

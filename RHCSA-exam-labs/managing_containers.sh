@@ -87,7 +87,71 @@ podman inspect mariadb
 cd mydb
 data  mysql.sock
 
+podman exec -it mariadb /bin/bash
+cd /var/lib/mysql
+data  mysql.sock
+
 
 ## Using containerfile
+# using the containerfile, build a container image with the name "helloworld:1.0" 
+# Start this container image once
+
+podman build -t helloworld:1.0 . # podman will find the containerfile if you reference the directory
+podman images # show the image is present
+REPOSITORY            TAG         IMAGE ID      CREATED      SIZE
+localhost/helloworld  1.0         f79f784d53c3  4 hours ago  213 MB
+
+podman run -d localhost/helloworld
+podman ps
+
 
 ## Systemd integration
+# Create a systemd unit file that will start the "mydb" container created earlier as user "linda"
+# The container should automatically be started when the system boots and not depend on the user login
+
+# activate user linda to enable container to not depend on user login
+sudo loginctl enable-linger linda
+sudo loginctl user-status linda
+linda (1002)
+           Since: Tue 2025-01-21 12:49:01 UTC; 2s ago
+           State: lingering
+          Linger: yes
+            Unit: user-1002.slice
+                  └─user@1002.service
+                    └─init.scope
+                      ├─19289 /usr/lib/systemd/systemd --user
+                      └─19291 "(sd-pam)"
+
+sudo loginctl show-user linda
+UID=1002
+GID=1002
+Name=linda
+Timestamp=Tue 2025-01-21 12:49:01 UTC
+TimestampMonotonic=8961521404
+RuntimePath=/run/user/1002
+Service=user@1002.service
+Slice=user-1002.slice
+State=lingering
+Sessions=
+IdleHint=yes
+IdleSinceHint=0
+IdleSinceHintMonotonic=0
+Linger=yes
+
+# log out and then back in as linda
+
+man podman-generate-systemd
+man podman-systemd.unit
+
+mkdir /home/linda/.config/systemd/user
+
+podman generate systemd --files --new --name mariadb
+
+systemctl --user enable container-great_austin.service
+
+reboot
+
+sudo -i # log in as root, not linda
+ps aux | grep linda
+
+/usr/bin/conmon # this is the container monitor
