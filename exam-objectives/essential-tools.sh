@@ -139,5 +139,17 @@ grep -E '^ERROR' logs.txt
 
 grep -E 'done$' logs.txt 
 
+# operators 
 
+|| # or
+
+&& # and 
+
+ls /root &>/dev/null || (echo run this script with root privileges && exit 2)
+
+# list contents of /root and silence all output
+# or run the echo command and exit with exit status 2 (usage or permission issues)
+
+& # runs commands in the background
+&& # logical AND, runs second command only if first succeeds
 

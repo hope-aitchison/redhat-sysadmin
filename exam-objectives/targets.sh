@@ -33,3 +33,14 @@ This is a temporary change and only affects the current boot
 
 systemctl rescue # keeps root filesystem mounted
 systemctl emergency # minimal shell with almost nothing running
+
+# reset lost root password
+
+Reboot and hold shift / ESC to enter GRUB menu
+Select kernel entry and e to edit
+
+linux /vmlinuz-... rw init=/bin/bash
+Ctrl X # boots into root shell with modified parameters
+passwd # reset the root password
+touch /.autorelabel # SElinux labelling
+exec /sbin/init # reboot from this shell
