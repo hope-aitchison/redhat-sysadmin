@@ -153,3 +153,31 @@ ls /root &>/dev/null || (echo run this script with root privileges && exit 2)
 & # runs commands in the background
 && # logical AND, runs second command only if first succeeds
 
+# scp
+
+securely transfer files between systems
+
+# from local to remote
+
+scp file.txt user@remotehost:/path/to/destination
+
+scp -r directory/ user@remotehost:/path/to/destination
+
+# from remote to local
+
+scp user@remotehost:/file/to/copy/file.txt /local/destination
+
+# use a specific port
+
+scp -P 2222 file.txt user@remotehost:/path/to/destination
+
+# sync files securely
+
+rsync # uses ssh
+
+rsync -av file.txt user@remotehost:/destination/
+-a # archive mode, preserves permissions
+-v # verbose
+
+rsync -avz directory/ user@remotehost:/destination/
+-z # compress during transfer
