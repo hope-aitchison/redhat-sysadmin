@@ -11,6 +11,9 @@ reboot.target - reboots the system
 poweroff.target - shuts down system
 emergency.target - bare minumum, shell only
 
+# to see available target files
+ls /usr/lib/systemd/system/
+
 # change targets whilst system running - no reboot
 
 systemctl isolate rescue.target

@@ -33,7 +33,14 @@ gdisk /dev/nvme1n1
 ? # show help
 n   1   +2G L   lvm     8e00    p   w   Y
 
-# create a filesystem
+# filesystems
+
+ext4 - linux file system with journaling
+vfat - windows and non-linux systems
+xfs - high performance for large files
+
+# create a filesystem / format the partition
+
 mkfs.ext4 /dev/device
 mkfs.vfat /dev/device
 mkfs.xfs /dev/device
@@ -99,7 +106,7 @@ systemctl daemon-reload
 
 # delete a lv
 
-umount /mnt/my_lv
+umount /mnt/my_lv # unmount
 
 lvchange -an /dev/my_vg/my_lv # deactivate
 
@@ -107,9 +114,46 @@ lvremove /dev/my_vg/my_lv
 
 lvs # verify
 
+# mounting at boot
 
+blkid /deb/nvme1n1 # obtain the UUID
 
+lsblk -o NAME,MOUNTPOINT,LABEL,UUID
 
+# in /etc/fstab
+# persistent mounting
 
+UUID=xxxx   /mnt/myfiles    xfs defaults    0   0
 
+# labelling
 
+e2label /dev/nvme1n1 mylabel # ext4
+xfs_admin -L mylabel /dev/nvme1n1 # xfs
+
+# in /etc/fstab
+LABEL=mylabel   /mnt/myfiles    xfs     defaults    0   0
+
+# apply changes
+mount -a
+
+# add new swap space without reboot
+
+Create swap partition (fdisk / gdisk / parted)
+or logical volume
+
+lvcreate -L 2G -n my_swap my_vg
+
+mkswap /dev/my_vg/my_swap # format
+
+swapon /dev/my_vg/my_swap # enable
+
+# make it persistent
+echo "/dev/my_vg/my_swap none swap defaults 0 0" >> /etc/fstab   
+
+# unmounting a filesystem
+
+umount /mnt/mydata
+
+lsof +D /mnt/mydata # identify processes using it
+
+umount -l /mny/mydata # force unmount

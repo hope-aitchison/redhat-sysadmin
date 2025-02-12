@@ -58,3 +58,25 @@ performance: Optimized for performance.
 powersave: Reduces power consumption.
 network-latency: Optimized for low network latency.
 throughput-performance: Optimized for high network/storage throughput.
+
+
+##  cron
+# runs scripts or commands at specific times
+
+systemctl status crond
+
+/etc/crontab # system-wide crontab file
+/etc/cron.d/ # custom cron job
+/etc/cron.allow # users allowed to use cron
+
+# cron job format
+MIN HOUR DOM MON DOW USER COMMAND
+
+crontab -e # edit crontab
+crontab -l # list scheduled jobs
+crontab -r # remove all cron jobs
+
+# users manage their own cron jobs
+
+/var/log/cron # logs sent here
+journalctl -u crond # check cron logs 
