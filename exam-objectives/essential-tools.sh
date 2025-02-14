@@ -181,3 +181,11 @@ rsync -av file.txt user@remotehost:/destination/
 
 rsync -avz directory/ user@remotehost:/destination/
 -z # compress during transfer
+
+getent # get entries
+# searches databases
+getent hosts hostname
+getent passwd
+getent group
+getent services
+getent networks

@@ -9,6 +9,12 @@ firewalld # need to install
 
 # NetworkManager - primary tool for managing network configurations
 
+systemctl status NetworkManager
+
+# start automatically at boot
+systemctl enable NetworkManager 
+/etc/systemd/system/multi-user.target.wants/ # symlink created here
+
 # config files
 /etc/NetworkManager/system-connections/
 
@@ -56,5 +62,36 @@ nmcli con mod eth0 ipv4.method auto
 
 nmcli con show eth0 # show specific connection details
 
+# hostname resolution
 
+/etc/hosts # hosts file
+/etc/resolv.conf # dns configuration
+/etc/nsswitch.conf # name service switch
 
+hostnamectl # check hostname
+hostnamectl set-hostname # change hostname
+
+getent # get entries
+
+# verify DNS name resolution
+getent hosts example.com
+nslookup example.com
+dig example.com
+
+dig # domain information grouper
+# queries dns servers directly for domain resolution 
+dig -x 8.8.8.8 # reverse dns lookup
+
+# configure local hostname
+/etc/hosts
+127.0.0.1   localhost
+192.168.1.10    webserver.local     webserver
+
+# configure name service switch
+# determines how the system resolves queries, states the order
+/etc/nsswitch.conf
+hosts: files    dns     myhostname
+# check /etc/hosts, then dns, then use system hostname as fallback
+
+# flush the dns cache
+systemd-resolve --flush-caches
