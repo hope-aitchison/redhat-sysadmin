@@ -53,3 +53,11 @@ ssh -X localhost gedit
 X11 forwarding allows users to run graphical applications on a remote server & interact  
 using their local device.
 
+# allow certain users only
+
+vim /etc/ssg/sshd_config
+AllowUsers hope bart
+
+systemctl restart sshd # always restart daemon after making changes to config
+
+

@@ -11,15 +11,26 @@ cat /etc/containers/registries.conf
 # An array of host[:port] registries to try when pulling an unqualified image, in order.
 unqualified-search-registries = ["registry.access.redhat.com", "registry.redhat.io", "docker.io"]
 
+# authenticate against registry
+podman login registry.redhat.io
+
 # check which images have been pulled and are available locally
 podman images
 
 # checks which images are available remotely and pull them to the local server
-podman search {container-app} | less
-podman pull {container-app}: latest
+podman search {image-name} | less
+podman pull {image-name}: latest # with most recent tag
 
-# check config and exposed ports
-podman inspect {image-id}
+podman search nginx # example
+
+# verify what images are downloaded locally
+podman images 
+
+# check metadata like config and exposed ports
+podman inspect {image-name}
+
+# delete image from local system
+podman rmi {image-name}
 
 # run a temporary container from the image and open an interactive shell
 podman run --rm -it {image-id} /bin/bash
@@ -33,13 +44,14 @@ podman run -d --name mydb {image-ID}
 # if container does not run correctly e.g. env variable required
 podman logs {container-ID}
 
+# nginx example
+podman run -d --name webserver -p 8080:80 nginx
 
 # mariadb example
 podman run -d --name mydb -e MYSQL_ROOT_PASSWORD=password {image-name:image-tag}
 
-# list all running containers
+# list all running containers including stopped ones
 podman ps -a
-
 
 # available ports
 sudo dnf install -y net-tools
@@ -58,9 +70,42 @@ podman rm -a
 podman stop -a && podman rm -a # combined total clearout
 podmam ps -a # verify
 
+# execute a task within a container
+podman exec -it {container-name} {command}
+# example
+podman exec -it webserver /bin/bash
+
+
 # namespaces
 # create new namespace
 podman unshare {command}
+
+## volumes
+# volumes help retain data after container removal
+# attach a host directory
+
+podman run -d --name my-container -v /host/directory:/container/directory:Z image-name
+# for logs
+mkdir -p /data/logs
+podman run -d --name nginx-server -v /data/logs:/var/log/nginx:Z nginx
+
+# podman volumes
+podman volume create mydata
+
+podman run -d --name db-server -v mydata:/var/lib/mysql mysql
+
+podman volume inpect mydata
+
+podman volume ls
+
+podman volume rm mydata
+
+# persisting storage across reboots
+
+ExecStart=/usr/bin/podman run --name my-service -v /data/storage:/app/data:Z myimage
+systemctl daemon-reload
+systemctl enable --now my-service.service
+
 
 ## Exam style task
 # Create a container with the name mydb that runs the mariadb database as user lisa 
@@ -119,12 +164,16 @@ ls -Z /var/lib/mysql
 mkdir -p .config/systemd/user/
 cd .config/systemd/user/
 podman generate systemd --name mydb --files --new
+
 ls 
 container-mydb.service
 
+# move the service file to systemd directory
+mv container-mydb.service /etc/systemd/system/
+
 # enable this new service so that it is registered with systemd
 systemctl --user daemon-reload
-systemctl --user enable container-mydb.service
+systemctl --user enable --now container-mydb.service
 # Created symlink /home/lisa/.config/systemd/user/default.target.wants/container-mydb.service → /home/lisa/.config/systemd/user/container-mydb.service.
 
 # reboot the host server
@@ -164,3 +213,10 @@ systemctl --user daemon-reload
 systemctl --user enable container-mydb.service
 
 # note: could not get this to work on RHEL9.4 EC2 instance using Red Hat documentation
+
+## skopeo
+
+# command line tool used to interact with container registries directly without pulling or running containers
+
+skopeo inspect docker://docker.io/library/nginx:latest
+

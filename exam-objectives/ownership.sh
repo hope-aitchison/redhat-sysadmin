@@ -97,3 +97,40 @@ getent group devops # group details
 pgasswd -A hope devops # assign admin to group
 # admin can add and remove users from group
 
+## default file permissions
+
+umask # determines default permissions
+# defines which permissions should be restricted from default full permissions
+
+# defaults
+777 # directories
+666 # files
+
+umask
+022
+
+files 644
+directories 755
+
+# temporary change for that session
+
+umask 027
+
+files 640
+directories 750
+
+# permanent change for user
+
+echo "umask 027" >> ~/.bashrc
+source ~/.bashrc
+
+# permanent system wide change
+
+/etc/profile
+
+echo 'umask 027' >> /etc/profile
+
+
+
+
+
