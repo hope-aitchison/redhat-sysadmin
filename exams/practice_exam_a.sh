@@ -41,8 +41,9 @@ dd if=/dev/sr0 of=/rhel.iso bs=1M
 df -h
 /dev/mapper/rhel-root   (N)G # root logical volume
 
+# mounts automatically
 vi /etc/fstab
-/rhel.iso   /repo   iso9660     loop    0   0
+/rhel.iso   /repo   iso9660     loop    0   0 # loop mounted
 
 # or 
 echo '/rhel.iso /repo iso9660 loop 0 0' | sudo tee -a /etc/fstab
@@ -164,12 +165,12 @@ chmod g+w operations
 
 ls -la
 
-chown root:livingopensource livingopensource/
+chown :livingopensource livingopensource/
 chown :operations operations/
 ls -la
 
 chmod 2770 livingopensource
-chmod 2770 livingopensource
+chmod 2770 operations
 ls -la
 
 touch livingopensource/file
@@ -182,9 +183,11 @@ Create a 2-GiB volume group with the name myvg, using 8-MiB physical extents. //
 In this volume group, create a 500-MiB logical volume with the name mydata, //
 and mount it persistently on the directory /mydata.
 
+# create a free partition
 gdisk /dev/nvme1n1
 n   1   +2G     8e00    w   Y   
 
+# define the physical extent size when creating the volume group
 vgcreate -s 8M myvg /dev/nvme1n1p1
 
 expr 500 / 8
@@ -192,10 +195,10 @@ expr 500 / 8
 lvcreate -l 63 -n mydata /dev/myvg
 # lvextend -l +1 /dev/myvg/mydata
 
-mkfs.ext4 /dev/myvg/mydata # needs a fs to be mounted
-mkdir /mydata
+mkfs.xfs /dev/myvg/mydata # needs a fs to be mounted 
+mkdir /mydata # xfs is the default rhel_9 filesystem
 
-echo "/dev/myvg/mydata /mydata ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/myvg/mydata /mydata xfs defaults 0 0" >> /etc/fstab
 mount -a
 findmnt --verify
 systemctl daemon-reload

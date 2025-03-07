@@ -26,6 +26,7 @@ chmod 1777 /data/sales # alternative
 
 useradd hope
 useradd -s /bin/bash # user with bash shell default
+useradd -u 1234 -s /sbin/nologin # user with specific UID and cannot start interactive shell
 
 usermod
 usermod -d /new/home/path hope
@@ -94,7 +95,7 @@ groupmod -n developers devops # change group name
 cat /etc/group # view all groups on system
 getent group devops # group details
 
-pgasswd -A hope devops # assign admin to group
+gpasswd -A hope devops # assign admin to group
 # admin can add and remove users from group
 
 ## default file permissions
