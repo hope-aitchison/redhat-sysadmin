@@ -24,7 +24,7 @@ podman pull {image-name}: latest # with most recent tag
 podman search nginx # example
 
 # verify what images are downloaded locally
-podman images 
+podman images
 
 # check metadata like config and exposed ports
 podman inspect {image-name}
@@ -94,7 +94,7 @@ podman volume create mydata
 
 podman run -d --name db-server -v mydata:/var/lib/mysql mysql
 
-podman volume inpect mydata
+podman volume inspect mydata
 
 podman volume ls
 
@@ -142,7 +142,6 @@ podman unshare chown 27:27 mydb
 
 # verify mapping
 podman unshare cat /proc/self/uid_map
-podman unshare cat /proc/self/gid_map
 
 # running the container
 podman search mariadb | less # select image to pull
@@ -160,10 +159,13 @@ ls -Z mydb
 podman exec -it mydb sh # access the container
 ls -Z /var/lib/mysql
 
-# create a systemd service file for mydb
+# create a systemd service file for mydb - this is for a specific user
 mkdir -p .config/systemd/user/
 cd .config/systemd/user/
 podman generate systemd --name mydb --files --new
+
+# .service file for system-wide container
+/etc/systemd/system/ # this is where other .service files are created
 
 ls 
 container-mydb.service
@@ -183,36 +185,15 @@ ps faux | less
 /lisa
 # check for a child of the conmon main process with mariadb declared - proof this is working!
 
-## note podman generate systemd is now DEPRECATED
-# quadlet files for root user 
+# systemd files for root user 
 /etc/containers/systemd/
-/usr/share/containers/systemd/
 
-# quadlet files for non-root users
-~/.config/containers/systemd/
-/etc/containers/systemd/users/$(UID)
-/etc/containers/systemd/users/
+# systemd files for rootless (user-specific) container
+/.config/containers/systemd/
 
 # create a mydb.container unit file
 cat ~/.config/containers/systemd/mydb.container
 
-####
-[Unit]
-Description=The mariadb container
-After=local-fs.target
-
-[Container]
-Image=docker.io/library/mariadb:latest
-Exec=
-
-[Install]
-# Start by default on boot
-WantedBy=multi-user.target default.target
-
-systemctl --user daemon-reload
-systemctl --user enable container-mydb.service
-
-# note: could not get this to work on RHEL9.4 EC2 instance using Red Hat documentation
 
 ## skopeo
 

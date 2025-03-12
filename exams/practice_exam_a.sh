@@ -209,7 +209,9 @@ Find all files that are owned by user edwin and copy them to the directory /root
 
 mkdir /rootedwinfiles
 
-find / -type f -user edwin -exec cp --parents '{}' /rootedwinfiles/ \;
+find / -type f -user edwin -exec cp --parents '{}' /rootedwinfiles/ \; 
+# cp --parents preserves the directory structure when copying
+# \; teriminates the exec command
 
 #########################################################################################
 
@@ -223,7 +225,7 @@ crontab -e
 crontab -l # to display
 
 cat /var/log/messages | tail -10 # check message output
-car /var/log/cron | tail -10 # check cron logs
+cat /var/log/cron | tail -10 # check cron logs
 
 #########################################################################################
 
@@ -251,7 +253,7 @@ mkdir /myfs
 
 lsblk --output=UUID /dev/stratis/mypool/myfs >> /etc/fstab
 vim /etc/fstab
-UUID    /myfs   xfs     stratis     0   0
+UUID    /myfs   xfs     x-systemd.requires=stratisd.service     0   0
 mount -a
 findmnt --verify
 systemctl daemon-reload 
@@ -263,6 +265,11 @@ lsblk -f # final verification
 Create user bob and set this users shell so that this user can only change the password //
 and cannot do anything else.
 
+# simple
+
+useradd -s /bin/passwd bob
+
+# complex & interactive
 useradd bob
 
 cd /usr/local/bin/
@@ -321,7 +328,7 @@ podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7:latest
 podman run --rm -it --entrypoint /bin/sh registry.access.redhat.com/rhscl/httpd-24-rhel7
 cd /var/www/html # confirm directory present
 
-podman run -d -p 80:80 --name http_server -v /httproot:/var/www/html:Z registry.access.redhat.com/rhscl/httpd-24-rhel7
+podman run -d --name http_server -v /httproot:/var/www/html:Z registry.access.redhat.com/rhscl/httpd-24-rhel7
 
 podman ps -a # confirm its running
 
@@ -333,6 +340,12 @@ container-http_server.service
 systemctl start container-http_server.service
 systemctl enable container-http_server.service # should now start on boot
 
+reboot
+
+# confirm runs on boot
+systemctl status container-http_server.service
+journalctl -b -u container-http_server.service
+
 #########################################################################################
 
 Create a directory with the name /users and ensure it contains the subdirectories //
@@ -341,6 +354,9 @@ linda and anna. Export this directory by using an NFS server.
 Create users linda and anna and set their home directories to /home/users/linda and //
 /home/users/anna. Make sure that while these users access their home directory, //
 autofs is used to mount the NFS shares /users/linda and /users/anna from the same server.
+
+
+## Task 1 
 
 mkdir /users
 cd /users
@@ -355,9 +371,14 @@ systemctl enable nfs-server
 
 vim /etc/exports
 /users      *(rw,no_root_squash)
+# directories must be exported on the nfs server before they can be mounted using autofs on the client
+# makes them accessible over the network
+
+systemctl enable --now nfs-server
 
 exportfs -r 
 exportfs -v # verify
+showmount -e 
 
 
 systemctl status firewalld
@@ -367,15 +388,18 @@ for i in rpc-bind mountd nfs; do firewall-cmd --add-services $i //
 firewall-cmd --reload
 firewall-cmd --list-services
 
+## Task 2
+
 useradd -d /home/users/linda -m linda
 useradd -d /home/users/anna -m anna
 
 dnf install -y autofs
 vim /etc/auto.master
 
+# tell autofs to refer to auto.user for mounts inside /home/users
 /home/users     /etc/auto.user
 
-linda -rw localhost:/users/linda
+linda -rw localhost:/users/linda # the directories made in Task 1
 anna  -rw localhost:/users/anna
 # replace localhost with nfsserver hostname or IP
 
@@ -386,3 +410,8 @@ cd /home/users
 # empty...
 cd linda
 # works!
+
+mount | grep autofs # to verify
+df -h # further verfication
+
+journalctl -xe | grep autofs # to check for any issues

@@ -157,3 +157,47 @@ umount /mnt/mydata
 lsof +D /mnt/mydata # identify processes using it
 
 umount -l /mny/mydata # force unmount
+
+## stratis volumes
+
+dnf install stratisd stratis-cli
+
+systemctl start stratisd
+
+# groups physical storage devices together
+stratis pool create mypool /dev/nvme1n1
+Name             Total / Used / Free    Properties                                   UUID   Alerts
+mypool   10 GiB / 528 MiB / 9.48 GiB   ~Ca,~Cr, Op   c03f3d10-1b66-4230-b2de-b7b0ff9f9bff   WS001
+
+stratis pool list
+
+stratis filesystem create mypool myfs
+Name              Total / Used / Free    Properties                                   UUID   Alerts
+mypool   10 GiB / 1.05 GiB / 8.95 GiB   ~Ca,~Cr, Op   c03f3d10-1b66-4230-b2de-b7b0ff9f9bff   WS001
+# takes up more disk space
+
+stratis filesystem list
+Pool     Filesystem   Total / Used / Free / Limit            Created             Device                     UUID
+mypool   myfs         1 TiB / 545 MiB / 1023.47 GiB / None   Mar 08 2025 12:01   /dev/stratis/mypool/myfs   3679ac80-f084-4982-8965-2b1e15f42110
+
+# mounting
+# stratis filesystems are mounted under /dev/stratis/mypool/myfs by default
+
+mkdir /myfs # create mountpoint
+
+ls /dev/stratis/mypool/myfs # to confirm present
+
+lsblk -o +FSTYPE # get the UUID and check fs should be xfs by default
+
+lsblk -o +UUID /dev/stratis/mypool/myfs >> /etc/fstab
+vim /etc/fstab
+
+# requires specific settings to ensure stratisd is started on boot
+UUID=XXX    /myfs   xfs     x-systemd.requires=stratisd.service 0   0
+
+# info on this setting in man systemd.mount
+
+mount -a
+systemctl daemon-reload
+
+df -kh # to confirm mount point

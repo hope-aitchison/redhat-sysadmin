@@ -69,6 +69,9 @@ systemctl daemon-reload
 Set default values for new users. Ensure that an empty file with the name NEWFILE is copied //
 to the home directory of each new user that is created.
 
+# When a new user is created using useradd, the contents of /etc/skel are 
+# copied into their home directory
+
 cd /etc/skel/
 touch NEWFILE
 
@@ -112,8 +115,8 @@ mkdir -p /groups/operations
 chown :livingopensource livingopensource
 chown :operations operations
 
-chmod 2770 livingopensource
-chmod 2770 operations
+chmod 1770 livingopensource
+chmod 1770 operations
 
 drwxrws---.  2 root livingopensource   6 Jul 25 17:36 livingopensource
 drwxrws---.  2 root operations         6 Jul 25 17:36 operations
@@ -137,17 +140,35 @@ findmnt --verify
 
 dnf install -y lvm2
 
-# cannot resize the root filesystem whilst it is mounted
-used parted to do so
+# grow filesystem
+lsblk -f # check current size of filesystem
+fdisk /dev/nvme0n1 # confirm size of partition filesystem
+
+parted /dev/nvme0n1 # this will display the actual partition size
 
 resize2fs /dev/rhel/root # if ext4
 xfs_growfs / # this was run
+
+# if it were a logical volume
+
+lvextend -L +1G /dev/mapper/rhel-root
+lvresize -L +1G /dev/mapper/rhel-root
+lvs # verify
+
+# this would take a GB from the volume group (mapper)
+
+# would then also have to resize the filesystem which sits on top of the LV
+
+xfs_growfs /
+df -h
 
 
 #########################################################################################
 
 Find all files that are owned by user linda and copy them to the //
 file /tmp/lindafiles/.
+
+mkdir -p /tmp/lindafiles/ # need to make the directory first
 
 find / -user linda -type f -exec cp --parent '{}' /tmp/lindafiles/ \;
 
@@ -185,7 +206,11 @@ and ensure it meets the following conditions
 
 cat /etc/passwd | grep linda # confirm
 
+# rootless container - needs to run under linda's namespace
+
+# enable linger for linda
 loginctl enable-linger linda
+# allows linda to start sessions even when not logged in
 loginctl show-user linda # confirm lingering state
 
 passwd linda
@@ -194,10 +219,16 @@ groupmod -U linda wheel # to allow sudo actions with linda
 su - linda
 sudo mkdir -p /home/student/mysql
 
-chown linda:linda /home/student/mysql
-
 podman pull docker.io/library/mysql:latest
-podman images
+
+podman inspect docker.io/library/mysql:latest
+podman run -i  docker.io/library/mysql:latest /bin/sh
+whoami # check which user
+id mysql
+# lists the uid and gid 
+999 999
+
+podman unshare chown 999:999 /home/student/mysql
 
 podman inspect docker.io/library/mysql:latest # searching for env var format
 
