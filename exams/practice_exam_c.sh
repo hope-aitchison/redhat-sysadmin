@@ -123,11 +123,15 @@ tuned-adm
 Add disk through UI
 
 
+#  Create a directory /users/ and in this directory create the directories user1 through user5 
+#  using one command.
 
-Create a directory /users/ and in this directory create the directories user1 through user5 using one command.
+#  Configure a web server to use the nondefault document root /webfiles. In this directory, create a 
+#  file index.html that has the contents hello world and then test that it works.
 
-Configure a web server to use the nondefault document root /webfiles. In this directory, create a file index.html that has the contents hello world and then test that it works.
+#  Configure your system to automatically start a mariadb container. This container should expose 
+# its services at port 3306 and use the directory /var/mariadb-container on the host for 
+# persistent storage of files it writes to the /var directory.
 
-Configure your system to automatically start a mariadb container. This container should expose its services at port 3306 and use the directory /var/mariadb-container on the host for persistent storage of files it writes to the /var directory.
-
-Configure your system such that the container created in step 15 is automatically started as a Systemd user container.
+#  Configure your system such that the container created in step 15 is automatically started as a 
+#  Systemd user container.
