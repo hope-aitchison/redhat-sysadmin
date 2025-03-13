@@ -209,26 +209,31 @@ cat /etc/passwd | grep linda # confirm
 # rootless container - needs to run under linda's namespace
 
 # enable linger for linda
+sudo -i
 loginctl enable-linger linda
 # allows linda to start sessions even when not logged in
 loginctl show-user linda # confirm lingering state
 
+mkdir -p /home/student/mysql
+
 passwd linda
 groupmod -U linda wheel # to allow sudo actions with linda
 
-su - linda
-sudo mkdir -p /home/student/mysql
+ssh linda@localhost # to ensure correct linda shell
 
 podman pull docker.io/library/mysql:latest
 
 podman inspect docker.io/library/mysql:latest
+# search for user
+
 podman run -i  docker.io/library/mysql:latest /bin/sh
 whoami # check which user
 id mysql
 # lists the uid and gid 
 999 999
 
-podman unshare chown 999:999 /home/student/mysql
+podman unshare chown 999:999 /home/student/mysql # map mysql user uid from container
+podman unshare ls -l /home/student/mysql
 
 podman inspect docker.io/library/mysql:latest # searching for env var format
 
@@ -247,5 +252,5 @@ reboot machine
 ps faux | less
 /linda
 
-# look for the child process 
+# look for the conmon child process 
 

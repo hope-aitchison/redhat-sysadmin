@@ -80,6 +80,8 @@ podman exec -it webserver /bin/bash
 # create new namespace
 podman unshare {command}
 
+# allows you to give the user id (UID) as it occurs within the container permissions to a host directory
+
 ## volumes
 # volumes help retain data after container removal
 # attach a host directory

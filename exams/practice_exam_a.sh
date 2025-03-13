@@ -56,20 +56,11 @@ ls /repo
 AppStream   BaseOS
 
 # create repo unit files 
-cd /etc/yum.repos.d
-vi base.repo
-[BaseOS]
-name=BaseOS Repo
-baseurl=file:///repo/BaseOS
-enabled=1
-gpgcheck=0
 
-vi appstream.repo
-[AppStream]
-name=AppStream Repo
-baseurl=file:///repo/AppStream
-enabled=1
-gpgcheck=0
+dnf config-manager --add-repo=file:///repo/Appstream
+dnf config-manager --add-repo=file:///repo/BaseOS
+
+cd /etc/yum.repos.d/
 
 set other .repo files to enabled=0
 
