@@ -108,7 +108,27 @@ find / -type f -perm -4000 >> /root/suidfiles
 
 # Create a 1-GiB LVM volume group. In this volume group, create a 512-MiB swap volume and mount it persistently.
 
+dnf install -y lvm2
 
+fdisk
+type lvm
+
+lsblk -f
+
+vgcreate VG /dev/nvme1n1p1
+
+vgdisplay
+
+lvcreate -n SWAP -L +512M VG /dev/nvme1n1p1
+
+lvdisplay
+
+mkswap /dev/VG/SWAP
+
+swapon /dev/VG/SWAP
+
+lsblk -o UUID /dev/VG/SWAP >> /etc/fstab
+UUID=xxx    none    swap    defaults    0   0
 
 # Add a 10-GiB disk to your virtual machine. On this disk, create a Stratis pool and volume. 
 # Use the name stratisvol for the volume, and mount it persistently on the directory /stratis.
