@@ -43,7 +43,13 @@ Reboot and hold shift / ESC to enter GRUB menu
 Select kernel entry and e to edit
 
 linux /vmlinuz-... rw init=/bin/bash
-Ctrl X # boots into root shell with modified parameters
+Ctrl X # boots into root shell with modified parameters\
+mount -o remount,rw /
 passwd # reset the root password
 touch /.autorelabel # SElinux labelling
-exec /sbin/init # reboot from this shell
+exec /usr/liv/systemd/system # reboot from this shell
+# can also reboot using vm software
+
+# persistently enable grub boot messages
+/etc/default/grub
+remove rhdb and quiet 

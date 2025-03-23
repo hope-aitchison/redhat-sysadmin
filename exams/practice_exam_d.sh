@@ -18,6 +18,8 @@ dnf config-manager --add-service=file:///repo/AppStream
 
 cd /etc/yum/repos.d/
 
+gpgcheck=0
+
 rm all other .repo files
 
 dnf config-list # to confirm
@@ -45,6 +47,9 @@ lsblk -f
 # Also, new passwords should have a maximum lifetime of 120 days.
 
 vim /etc/login.defs
+PASS_MAX_DAYS   120
+PASS_WARN_AGE   3
+
 
 useradd testuser
 chage -l testuser
@@ -104,7 +109,7 @@ systemctl daemon-reload
 
 man find # examples
 
-find / -type f -perm -4000 >> /root/suidfiles
+find / -type f -perm -4000 > /root/suidfiles
 
 # Create a 1-GiB LVM volume group. In this volume group, create a 512-MiB swap volume and mount it persistently.
 
@@ -120,7 +125,7 @@ vgcreate VG /dev/nvme1n1p1
 vgdisplay
 
 lvcreate -n SWAP -L +512M VG /dev/nvme1n1p1
-
+l
 lvdisplay
 
 mkswap /dev/VG/SWAP

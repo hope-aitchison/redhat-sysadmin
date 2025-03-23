@@ -35,3 +35,17 @@ grep -E "svm|vmx" /proc/cpuinfo
 ## Examples and doc locations for anaconda installer files
 /usr/share/doc/anaconda/examples
 /root/anaconda-ks.cfg
+
+
+# Create a kickstart file with the name my-ks.cfg and make sure it can be used for an automated installation
+# Installer prompts for a password
+# Network connectivity will be enabled on boot
+# Local machine name is set to server10.example.com
+
+sudo -i
+cp ~/anaconda-ks.cfg my-ks.cfg
+vim my-ks.cfg 
+....hostname=server10.example.com
+
+# Root
+remove this line to prompt for password

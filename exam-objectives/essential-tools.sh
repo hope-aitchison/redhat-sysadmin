@@ -139,7 +139,16 @@ grep -E '^ERROR' logs.txt
 
 grep -E 'done$' logs.txt 
 
-# operators 
+grep 'root\b' * 2>/dev/null # find all times root is declared in a file and remove all error messages
+
+grep '^...$' * 2>/dev/null # finds all files that contain only 3 characters
+
+grep '\balex\b' * 2>/dev/null # finds all files that contains alex but not alexander
+
+\b # starts or ends the pattern search
+
+
+## operators 
 
 || # or
 

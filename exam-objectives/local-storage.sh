@@ -176,6 +176,7 @@ Name              Total / Used / Free    Properties                             
 mypool   10 GiB / 1.05 GiB / 8.95 GiB   ~Ca,~Cr, Op   c03f3d10-1b66-4230-b2de-b7b0ff9f9bff   WS001
 # takes up more disk space
 
+# stratis default filesystem is xfs
 stratis filesystem list
 Pool     Filesystem   Total / Used / Free / Limit            Created             Device                     UUID
 mypool   myfs         1 TiB / 545 MiB / 1023.47 GiB / None   Mar 08 2025 12:01   /dev/stratis/mypool/myfs   3679ac80-f084-4982-8965-2b1e15f42110

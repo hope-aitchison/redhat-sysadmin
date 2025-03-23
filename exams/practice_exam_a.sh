@@ -7,7 +7,7 @@ Install a RHEL 9 virtual machine that meets the following requirements:
 
 #########################################################################################
 
-Create user student with password password, and user root with password password.
+# Create user student with password password, and user root with password password.
 
 #!/bin/bash
 
@@ -20,11 +20,11 @@ passwd root: password
 #########################################################################################
 
 
-Configure your system to automatically mount the ISO of the installation disk on //
-the directory /repo. Configure your system to remove this loop-mounted ISO as the //
-only repository that is used for installation. 
-Do not register your system with subscription-manager, and remove all references //
-to external repositories that may already exist.
+# Configure your system to automatically mount the ISO of the installation disk on //
+# the directory /repo. Configure your system to remove this loop-mounted ISO as the //
+# only repository that is used for installation. 
+# Do not register your system with subscription-manager, and remove all references //
+# to external repositories that may already exist.
 
 #!/bin/bash
 
@@ -62,6 +62,8 @@ dnf config-manager --add-repo=file:///repo/BaseOS
 
 cd /etc/yum.repos.d/
 
+set gpgckeck=0
+
 set other .repo files to enabled=0
 
 dnf repolist # check which ones enabled
@@ -69,15 +71,16 @@ dnf install -y vim # check it's coming from local repo only
 
 #########################################################################################
 
-Reboot your server. Assume that you don’t know the root password, and use the appropriate //
-mode to enter a root shell that doesn’t require a password. Set the root password to mypassword.
+# Reboot your server. Assume that you don’t know the root password, and use the appropriate //
+# mode to enter a root shell that doesn’t require a password. Set the root password to mypassword.
 
 - grub bootloader menu whilst booting
 - restart machine using vm software
+- hit enter or shift to pause boot
 - have cursor over the linux kernel and hit "e"
 - add init=/bin/bash to end of the line starting with linux in the file that opens
 - installation process is now in bash rather than systemd
-- save the file and start the linux kernel (in bash shell)
+- ctrl-X to start the linux kernel (in bash shell)
 - need to set the / directory to be rw
 
 mount -o remount,rw /
@@ -95,8 +98,8 @@ exec /usr/lib/systemd/systemd # to reboot the system as reboot will not work
 
 #########################################################################################
 
-Set default values for new users. Set the default password validity to 90 days //
-and set the first UID that is used for new users to 2000.
+# Set default values for new users. Set the default password validity to 90 days //
+# and set the first UID that is used for new users to 2000.
 
 #!/bin/bash
 
@@ -110,16 +113,16 @@ UID_MIN                  2000
 
 #########################################################################################
 
-Create users edwin and santos and make them members of the group livingopensource //
-as a secondary group membership. Also, create users serene and alex and make //
-them members of the group operations as a secondary group //
-Ensure that user santos has UID 1234 and cannot start an interactive shell.
+# Create users edwin and santos and make them members of the group livingopensource //
+# as a secondary group membership. Also, create users serene and alex and make //
+# them members of the group operations as a secondary group //
+# Ensure that user santos has UID 1234 and cannot start an interactive shell.
 
 groupadd livingopensource
 groupadd operations
 
 useradd -G livingopensource  edwin
-useradd -G livingopensource -u 1234 -s /sbin/nologin santos
+useradd -G livingopensource -u 1234 -s /usr/sbin/nologin santos
 
 useradd -G operations serene
 useradd -G operations alex
@@ -132,19 +135,19 @@ operations:x:2003:serene,alex
 
 getent passwd edwin/santos/serene/alex
 edwin:x:2000:2000::/home/edwin:/bin/bash
-santos:x:1234:1234::/home/santos:/sbin/nologin
+santos:x:1234:1234::/home/santos:/usr/sbin/nologin
 serene:x:2001:2001::/home/serene:/bin/bash
 alex:x:2002:2004::/home/alex:/bin/bash
 
 #########################################################################################
 
-Create shared group directories /groups/livingopensource and /groups/operations, //
-and make sure the groups meet the following requirements:
-Members of the group livingopensource have full access to their directory.
-Members of the group operations have full access to their directory.
-New files that are created in the group directory are group owned by the group owner //
-of the parent directory.
-Others have no access to the group directories.
+# Create shared group directories /groups/livingopensource and /groups/operations, //
+# and make sure the groups meet the following requirements:
+# * Members of the group livingopensource have full access to their directory.
+# * Members of the group operations have full access to their directory.
+# * New files that are created in the group directory are group owned by the group owner //
+#   of the parent directory.
+# * Others have no access to the group directories.
 
 mkdir -p /groups/livingopensource
 mkdir -p /groups/operations
@@ -170,18 +173,19 @@ ls -la livingopensource/
 
 #########################################################################################
 
-Create a 2-GiB volume group with the name myvg, using 8-MiB physical extents. //
-In this volume group, create a 500-MiB logical volume with the name mydata, //
-and mount it persistently on the directory /mydata.
+# Create a 2-GiB volume group with the name myvg, using 8-MiB physical extents. //
+# In this volume group, create a 500-MiB logical volume with the name mydata, //
+# and mount it persistently on the directory /mydata.
 
 # create a free partition
 gdisk /dev/nvme1n1
-n   1   +2G     8e00    w   Y   
+n   1   +2G     8e00    w   Y 
+
+echo $(( 500 / 8 ))
+62
 
 # define the physical extent size when creating the volume group
 vgcreate -s 8M myvg /dev/nvme1n1p1
-
-expr 500 / 8
 
 lvcreate -l 63 -n mydata /dev/myvg
 # lvextend -l +1 /dev/myvg/mydata
@@ -196,7 +200,7 @@ systemctl daemon-reload
 
 #########################################################################################
 
-Find all files that are owned by user edwin and copy them to the directory /rootedwinfiles.
+# Find all files that are owned by user edwin and copy them to the directory /rootedwinfiles.
 
 mkdir /rootedwinfiles
 
@@ -206,8 +210,8 @@ find / -type f -user edwin -exec cp --parents '{}' /rootedwinfiles/ \;
 
 #########################################################################################
 
-Schedule a task that runs the command touch /etc/motd every day from Monday //
-through Friday at 2 a.m.
+# Schedule a task that runs the command touch /etc/motd every day from Monday //
+# through Friday at 2 a.m.
 
 vim /etc/crontab # for layout
 crontab -e
@@ -220,13 +224,13 @@ cat /var/log/cron | tail -10 # check cron logs
 
 #########################################################################################
 
-Add a new 10-GiB virtual disk to your virtual machine. On this disk, add a Stratis //
-volume and mount it persistently.
+# Add a new 10-GiB virtual disk to your virtual machine. On this disk, add a Stratis //
+# volume and mount it persistently.
 
 dnf install -y stratis-cli
 dnf install -y stratisd
 
-systemctl start stratis
+systemctl enable --now stratis
 systemctl status stratis
 
 stratis pool list # check space in pool
@@ -244,7 +248,7 @@ mkdir /myfs
 
 lsblk --output=UUID /dev/stratis/mypool/myfs >> /etc/fstab
 vim /etc/fstab
-UUID    /myfs   xfs     x-systemd.requires=stratisd.service     0   0
+UUID    /myfs   xfs     defaults,x-systemd.requires=stratisd.service     0   0
 mount -a
 findmnt --verify
 systemctl daemon-reload 
@@ -253,36 +257,16 @@ lsblk -f # final verification
 
 #########################################################################################
 
-Create user bob and set this users shell so that this user can only change the password //
-and cannot do anything else.
+# Create user bob and set this users shell so that this user can only change the password //
+# and cannot do anything else.
 
-# simple
+which passwd
 
-useradd -s /bin/passwd bob
-
-# complex & interactive
-useradd bob
-
-cd /usr/local/bin/
-vim bob_password_shell.sh
-
-#!/bin/bash
-echo "Change your password Bob!"
-exec /usr/bin/passwd
-
-chmod +x bob_password_shell.sh # make sure it is executable
-
-vim /etc/passwd
-# edit bob's entry:
-bob:x:2003:2005::/home/bob:/usr/local/bin/bob_passwd_shell.sh
-
-su - bob
-Change your password Bob!
-Changing password for user bob.
+useradd -s /usr/bin/passwd bob
 
 #########################################################################################
 
-Install the vsftpd service and ensure that it is started automatically at reboot.
+# Install the vsftpd service and ensure that it is started automatically at reboot.
 
 dnf install -y vsftpd
 systemctl enable vsftpd # this step means it starts on reboot
@@ -301,10 +285,10 @@ firewall-cmd --reload
 #########################################################################################
 
 
-Create a container that runs an HTTP server. Ensure that it mounts the host directory //
-/httproot on the directory /var/www/html.
-Configure this container such that it is automatically started on system boot as a //
-system user service.
+# Create a container that runs an HTTP server. Ensure that it mounts the host directory //
+# /httproot on the directory /var/www/html.
+# Configure this container such that it is automatically started on system boot as a //
+# system user service.
 
 dnf install -y podman
 dnf install -y container-tools
@@ -316,7 +300,7 @@ podman search http | less
 
 podman pull registry.access.redhat.com/rhscl/httpd-24-rhel7:latest
 
-podman run --rm -it --entrypoint /bin/sh registry.access.redhat.com/rhscl/httpd-24-rhel7
+podman run --rm -it registry.access.redhat.com/rhscl/httpd-24-rhel7 /bin/sh
 cd /var/www/html # confirm directory present
 
 podman run -d --name http_server -v /httproot:/var/www/html:Z registry.access.redhat.com/rhscl/httpd-24-rhel7
@@ -336,15 +320,16 @@ reboot
 # confirm runs on boot
 systemctl status container-http_server.service
 journalctl -b -u container-http_server.service
+ps faux
 
 #########################################################################################
 
-Create a directory with the name /users and ensure it contains the subdirectories //
-linda and anna. Export this directory by using an NFS server.
+# Create a directory with the name /users and ensure it contains the subdirectories //
+# linda and anna. Export this directory by using an NFS server.
 
-Create users linda and anna and set their home directories to /home/users/linda and //
-/home/users/anna. Make sure that while these users access their home directory, //
-autofs is used to mount the NFS shares /users/linda and /users/anna from the same server.
+# Create users linda and anna and set their home directories to /home/users/linda and //
+# /home/users/anna. Make sure that while these users access their home directory, //
+# autofs is used to mount the NFS shares /users/linda and /users/anna from the same server.
 
 
 ## Task 1 
@@ -357,15 +342,14 @@ ls
 
 dnf install -y nfs-utils
 
-systemctl start nfs-server
-systemctl enable nfs-server
+systemctl enable --now nfs-server
 
 vim /etc/exports
 /users      *(rw,no_root_squash)
 # directories must be exported on the nfs server before they can be mounted using autofs on the client
 # makes them accessible over the network
 
-systemctl enable --now nfs-server
+systemctl restart nfs-server
 
 exportfs -r 
 exportfs -v # verify
@@ -395,7 +379,6 @@ anna  -rw localhost:/users/anna
 # replace localhost with nfsserver hostname or IP
 
 systemctl enable --now autofs
-systemctl start autofs
 
 cd /home/users
 # empty...

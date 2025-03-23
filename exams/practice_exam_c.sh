@@ -26,6 +26,8 @@ cd /etc/yum.repos.d
 # set all other repo configs to 
 enabled=0
 
+gpgpcheck=1 # in new repo files
+
 dnf repolist # check which are available
 
 dnf install -y vim # to confirm
@@ -63,6 +65,9 @@ sudo -i
 /etc/security/pwquality.conf
 minlength = 6
 
+vim /etc/login.defs
+PASS_MIN_DAYS=3
+
 systemtl daemon-reload
 
 # Create users linda and anna and make them members of the group sales as a secondary group membership. 
@@ -84,6 +89,8 @@ cd /etc/ssh/sshd_config
 
 port 2022
 PermitRootLogin yes
+
+man semanage-port
 
 semanage port -a -t ssh_port_t -p tcp 2022
 semanage port -l | grep ssh

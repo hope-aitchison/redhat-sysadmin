@@ -36,6 +36,24 @@ sudo reboot # reboot system
 journalctl --verify # see where logs are sent to
 ls -lh /var/log/journal/
 
+# ensure systemd journal is logged persistently
+ls /var/log/journal
+/etc/systemd/journal.conf
+#AUTO
+
+# rsyslog - writes logs from systemd journal to persistent locations
+
+/etc/rsyslog.conf
+systemctl restart rsyslog.service # for when any changes made
+
+# enter messages into the system log
+logger -p # convenient to test priorities working
+logger -p err whatever
+cat /var/log/error
+
+# log rotation config - manages rotation and archiving of log files
+/etc/logrotate.conf
+/etc/logrotate.d/error # custom rotation rules for error log files
 
 
 

@@ -79,7 +79,7 @@ else
 fi
 
 # this method checks if the first positional parameter ($1) is empty
-# if $1 is empty it implies no argumentd were passed into the script
+# if $1 is empty it implies no arguments were passed into the script
 # essentially this is saying "if zero at argument1"
 
 # $@ special variable that represents all positional arguments passed to the script
@@ -102,7 +102,7 @@ for i in $USERS; do
 done
 
 
-## final scripy
+## final script
 
 if [[ $# -eq 0 ]]; then
         echo "No users provided, please input users"

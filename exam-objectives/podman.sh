@@ -33,7 +33,7 @@ podman inspect {image-name}
 podman rmi {image-name}
 
 # run a temporary container from the image and open an interactive shell
-podman run --rm -it {image-id} /bin/bash
+podman run --rm -it {image-id} /bin/sh
 
 # specific options for this command
 podman run --help

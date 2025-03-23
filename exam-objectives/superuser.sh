@@ -32,6 +32,13 @@ bart ALL=(ALL) /sbin/shutdown, /sbin/reboot
 # grant passwordless sudo access
 hope ALL=(ALL) NOPASSWORD: ALL
 
+# allow user bart to have sudo access to change passwords but not for root
+bart ALL=/usr/sbin/passwd, ! /usr/sbin/passwd root
+
+# add a default that makes all sudo users only enter their password every 60 seconds
+Defaults timestap_type=global , timestamp_timeout=60
+
+
 # restricting root login for ssh
 
 /etc/ssh/sshd_config 
