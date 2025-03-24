@@ -7,7 +7,7 @@ man chronyd
 vim /usr/lib/systemd/system/chronyd.service
 "NTP client/server"
 
-dnf install chrony
+dnf install chronyd
 systemctl enable chronyd
 
 # configuration file

@@ -33,6 +33,6 @@ tar -cJvf /tmp/my_archive.xz /home /etc # xz
 
 tar -cvf /home/example.tar /opt /etc
 cd /tmp
-ln -s /home/example.tar example.tar
+ln -s /home/example.tar /tmp/example.tar
 ls -la # shows new link 
 

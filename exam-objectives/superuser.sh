@@ -26,8 +26,8 @@ ALL - rule applies to all hosts, ignored on standalone system
 ALL - user can run any command with sudo
 
 # specific commands granted to a user
-bart ALL=(ALL) /sbin/shutdown, /sbin/reboot
-# bart can run shutdown and reboot
+bart ALL=(ALL) usr/sbin/shutdown, usr/sbin/reboot
+# bart can run shutdown and reboot as sudo
 
 # grant passwordless sudo access
 hope ALL=(ALL) NOPASSWORD: ALL
