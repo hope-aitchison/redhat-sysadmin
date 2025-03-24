@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# Redirecting stdin stout & stderr
+
+Standard input, stdin, 0
+Standard output, stdout, 1
+Standard error, stderr, 2
+
+ls > output.txt # overwrite
+ls >> output.txt # append
+ls /nonexistantdir 2>> error.txt # send error messages to file
+
+ls /nonexistantdir &>> error.txt # send output and error messages to file
+
+# Redirecting stdin
+
+Provide a file as input to a command
+
+sort < names.txt
+
+# Combination
+
+command < file.txt > output.txt 2> error.txt
+
+
+# pipe
+
+Sends output of one command as input to another
+
+ls -l | grep ".txt"
+cat file.txt | wc -l
+wc -l > file.txt # more efficient
+
+#######################################
+
+# grep
+
+man grep
+grep  searches  for PATTERNS in each FILE
+
+grep -i # case insensitive
+
+ps aux | grep ssh
+# lists all running ssh processes
+
+ps aux | grep ssh | grep -v grep
+# removes the grep process from the list output
+
+grep -A 5 -B 5 Allow /etc/ssh/sshd_config
+# first 5 lines and last 5 lines search "Allow"
+
+grep root /etc/shadow fn=35
+# show location in magenta
+
+#######################################
+
+# regexp
+
+Used to match character combinations in strings - pattern matching
+Pattern declared in 'single' quotes
+
+vim users
+alex
+alexander
+linda
+belind
+
+leanna
+anna
+annabella
+anna bella
+banana
+
+bit
+bet
+bot
+boat
+boot
+booooot
+
+grep 'l' users # any names containing an l
+alex
+alexander
+linda
+belind
+leanna
+annabella
+anna bella
+
+grep '^l' users # any names beginning with l
+linda
+leanna
+
+grep 'anna$' users # names that end in pattern anna
+leanna
+anna
+
+grep 'b.*t' users # names that begin with b and end with t with any number of characters in between
+bit
+bet
+bot
+boat
+boot
+booooot
+
+grep 'b.+t' users
+
+grep -E 'b.+t' users # extended regex! 1 or more characters
+bit
+bet
+bot
+boat
+boot
+booooot
+
+grep -E 'b.?t' users # 0 or 1 character
+bit
+bet
+bot
+
+grep -E 'b.*t' users # 0 or more chacters
+bit
+bet
+bot
+boat
+boot
+booooot
+
+grep 'bo\{3\}t' users # o occurs 3 times
+grep 'bo\{4\}t' users # o occurs 4 times
+grep 'bo\{5\}t' users # o occurs 5 times
+booooot
+
+# handy regexp greps
+
+grep -E 'error|fail|warn' logs.txt
+
+grep -E '^ERROR' logs.txt
+
+grep -E 'done$' logs.txt 
+
+grep 'root\b' * 2>/dev/null # find all times root is declared in a file and remove all error messages
+
+grep '^...$' * 2>/dev/null # finds all files that contain only 3 characters
+
+grep '\balex\b' * 2>/dev/null # finds all files that contains alex but not alexander
+
+\b # starts or ends the pattern search
+
+
+## operators 
+
+|| # or
+
+&& # and 
+
+ls /root &>/dev/null || (echo run this script with root privileges && exit 2)
+
+# list contents of /root and silence all output
+# or run the echo command and exit with exit status 2 (usage or permission issues)
+
+& # runs commands in the background
+&& # logical AND, runs second command only if first succeeds
+
+# scp
+
+securely transfer files between systems
+
+# from local to remote
+
+scp file.txt user@remotehost:/path/to/destination
+
+scp -r directory/ user@remotehost:/path/to/destination
+
+# from remote to local
+
+scp user@remotehost:/file/to/copy/file.txt /local/destination
+
+# use a specific port
+
+scp -P 2222 file.txt user@remotehost:/path/to/destination
+
+# sync files securely
+
+rsync # uses ssh
+
+rsync -av file.txt user@remotehost:/destination/
+-a # archive mode, preserves permissions
+-v # verbose
+
+rsync -avz directory/ user@remotehost:/destination/
+-z # compress during transfer
+
+getent # get entries
+# searches databases
+getent hosts hostname
+getent passwd
+getent group
+getent services
+getent networks

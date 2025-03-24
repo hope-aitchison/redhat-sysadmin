@@ -4,27 +4,41 @@
 ## automount
 # automatically mounts and unmounts filesystems based on activity
 
+dnf install -y autofs
+systemctl enable --now autofs
+
 automount # daemon
 autofs # config files
 
-# master map file
-/etc/auto.master
-...
-/data /etc/auto.nfsdata
+# autofs uses master and map files
+
+# master file
+/etc/auto.master # global autofs settings
+
+# map file
+/etc/auto.nfs 
+
 # identify the directory (mountpoint) autofs should manage
 # state the config file to be used for this mountpoint
 
-# secondary file
-vim auto.nfsdata
-files   -rw localhost:/nfsdata
-# creates an entry /data/files
-# mounts on localhost:/nfsdata
+# master file
+/nfsdata /etc/auto.nfs --timeout=300 # base mount point, map file, unmount after 5 mins inactivity
 
+
+# map file
+files   -rw IP:/nfsdata # subdirectory, mount options, NFSserver and exported directory
+
+# mounts on IP:/nfsdata
+
+systemctl restart autofs
 systemctl enable autofs
 
+# verify from remote machine
+ls /nfsdata
 cd /nfsdata/files
 
 mount | tail -3
+mount | grep autofs
 
 ###########################################
 ## multui user example
@@ -36,7 +50,7 @@ vim /etc/auto.master
 /homes      /etc/auto.homes
 
 vim /etc/auto.homes
-*   -rw     localhost:/home/ldap/&
+*   -rw     localhost:/home/ldap/
 
 systemctl restart auto-fs
 systemctl status auto-fs

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-find
+# find
 
 man find
 find - search for files in a directory hierarchy
@@ -14,17 +14,26 @@ which passwd # shows binary location of passwd command
 find / -name "hosts"
 # /etc/hosts
 
-find /etc -exec grep -l student {} \; -exec cp {} find/contents/ \;
+find /etc -exec grep -l student {} \;
 # looks for files in /etc that contain "student"
-# copies all directories and files to find/contents
+
+find /etc -exec grep -H ec2-user {} \;
+# looks for files in /etc that contains ec2-user and outputs location
+
+find /etc -exec grep -H ec2-user {} \; > files.txt
+# outputs the find results to files.txt
 
 find / -type f -size +100M
 # find files only larger than 100 mb
-find / -type f -size +100M -exec cp {} /find/big \;
-# find files only larger than 100 mb and copy them to /find/big
+find / -type f -size +100M -exec cp {} /big.txt \;
+# find files only larger than 100 mb and copy the contents of them to /big.txt
 
-# cp {} performs for each file found by find
-# would be missing file to be copied to the /find/big destination
+find /etc -type f -size +10M > /big.txt
+# find files only larger than 100 mb and copy the location to /big.txt
+
+-exec cp {} # performs for each file found by find
+
+find /etc -type f | xargs grep "ec2-user" # same command with xargs instead
 
 find /etc/ -name '*' -type f | xargs grep "127.0.0.1"
 # xargs takes stinput from find command (list of files found) and executes grep using those items as arguments

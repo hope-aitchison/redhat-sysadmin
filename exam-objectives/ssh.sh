@@ -6,18 +6,18 @@ cat /etc/hosts
 # ssh config
 cat /etc/ssh/sshd_config
 
+# generate ssh key
 cd ~/.ssh/
 ssh-keygen -t rsa -b 4096 
-
-# check the filepath for keys
-sudo cat /etc/ssh/sshd_config | grep keys
-# AuthorizedKeysFile	.ssh/authorized_keys
-
 cat id_rsa.pub >> ~/.ssh/authorized_keys
 
 # set correct access permissions
 chmod 700 ~/.ssh/
 chmod 600 ~/.ssh/authorized_keys
+
+# check the filepath for keys
+sudo cat /etc/ssh/sshd_config | grep keys
+# AuthorizedKeysFile	.ssh/authorized_keys
 
 systemctl status sshd
 ssh user@localhost
@@ -41,12 +41,23 @@ vim /etc/ssh/sshd_config
 X11Forwarding yes
 PermitRootLogin yes
 Port 22
+
 systemctl restart sshd
 ssh root@localhost
 # make sure key available in .ssh
+
 # install GNOME text editor
 dnf install -y gedit
 ssh -X localhost gedit
 
-# X11 run graphical applications on the remote server and display them on your local machine
+X11 forwarding allows users to run graphical applications on a remote server & interact  
+using their local device.
+
+# allow certain users only
+
+vim /etc/ssg/sshd_config
+AllowUsers hope bart
+
+systemctl restart sshd # always restart daemon after making changes to config
+
 

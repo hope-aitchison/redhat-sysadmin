@@ -71,7 +71,7 @@ chmod 070 /data/profs
 
 ### Finding files
 ## find all files with a size bigger than 100MiB
-t## perform a command on the result of the find command
+## perform a command on the result of the find command
 -exec command {} \;
 awk # to be used in place of grep
 

@@ -4,6 +4,7 @@
 
 # selinux status
 getenforce
+
 # change selinux status
 sudo setenforce # Enforcing or Permissive
 
@@ -30,6 +31,45 @@ semanage fcontext
 
 # see manual pages for examples
 man semanage-fcontext
+
+# selinux file contexts
+User: system_u # always 
+Role: object_r # usually
+Type: httpd_sys_content_t # example for web files
+Level: MLS/MCS # not typically used
+
+# list contexts for files
+ls -Z /var/www/html/index.html
+
+# view selinux process contexts
+ps -eZ | grep httpd
+system_u:system_r:httpd_t:s0  1234 ?  00:00:01 httpd
+httpd_t # process runs in the httpd security domain
+
+# see selinux context for a specific process
+ps -Z -p <PID> 
+
+
+# selinux contexts for network ports
+
+semanage port -l | grep http 
+http_port_t  tcp  80, 443 # selinux type for web traffic
+
+# determining the correct context label
+# selinux maintains a database of default contexts for system files
+
+semanage fcontext -l | grep "var/www/html"
+/var/www/html(/.*)?   all files   system_u:object_r:httpd_sys_content_t:s0
+
+# SElinux logs
+
+sudo journalctl -t setroubleshoot
+
+# restoring default file contexts
+
+restorecon -Rv /var/www/html
+
+restorecon -v /var/www/html/index.html
 
 
 ############################################
@@ -138,12 +178,22 @@ grep AVC /var/log/audit/audit.log | grep sshd # selinux uses auditd for logging
 # update a port to use a new label
 semanage port -a -t ssh_port_t -p tcp 2202
 
+# modify an existing label
+semanage port -m -t mysqld_port_t -p tcp 8080
+# changes MySQL to use 8080 instead of http
+
+ss -tulnp | grep 8080 # confirm mysqld now using 8080
+
 #####################################
 ## SELinux booleans
+# enable or disable specific selinux policies without modifying contexts
+
 
 # Overview of all booleans
 semanage boolean -l
 getsebool -a
+
+getsebool httpd_can_network_connect
 
 # to change booleans
 setsebool -P boolean-name on/off # P for persistent
@@ -155,3 +205,24 @@ semanage boolean -l -C
 getsetbool -a | grep ftp
 setsebool -P ftpd_anon_write on
 semanage boolean -l -C
+
+# restore all booleans
+semanage boolean --restore
+
+
+## diagnosing selinux related issue
+
+grep AVC /var/log/audit/audit.log
+# AVC = access vector cache
+
+# search for recent selinux violations
+ausearch -m AVC --start recent
+
+# selinux logs
+
+journalctl -t setroubleshoot
+
+setroubleshoot-server # translates selinux denials 
+
+sealert -a /var/log/audit/audit.log
+

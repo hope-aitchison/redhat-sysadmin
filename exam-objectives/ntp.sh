@@ -7,8 +7,17 @@ man chronyd
 vim /usr/lib/systemd/system/chronyd.service
 "NTP client/server"
 
-# parameters
+dnf install chronyd
+systemctl enable chronyd
+
+# configuration file
 /etc/chronyd.conf
+
+# specify an NTP server
+vim /etc/chronyd.conf
+server 0.pool.ntp.org iburst
+server 1.pool.ntp.org iburst
+server 2.pool.ntp.org iburst
 
 ## update server to use pool.ntp.org
 timedatectl status # check ntp server active

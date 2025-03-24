@@ -46,25 +46,10 @@ CONTAINER ID  IMAGE                           COMMAND               CREATED     
 # container MYSQL_ROOT_PASSWORD is set to "password"
 # SELinux is operational and allowing access
 
-# add linda to group wheel for sudo access & create password
-useradd linda -G wheel
-cat /etc/group | grep wheel
-passwd linda
+# login to a linda shell
+ssh linda@localhost
 
-# update selinux label for ~/mydb
-su - linda
-sudo semanage fcontext -a -t container_file_t "/home/linda/mydb(/.*)?"
-sudo restorecon -RFv /home/linda/mydb
-Relabeled /home/linda/mydb from unconfined_u:object_r:user_home_t:s0 to system_u:object_r:container_file_t:s0
-
-# change host directory ownership
-# run a temporary container and check service uids
-podman run --rm registry.redhat.io/rhel9/mariadb-105 id mysql
-uid=27(mysql) gid=27(mysql) groups=27(mysql),0(root)
-
-# rootless container so run user namespace
-podman unshare chown 27:27 /home/linda/mydb 
-chmod 777 /home/linda/mydb
+# change host directory ownership to match UID of container user
 
 # login to redhat registry and pull container
 cat /etc/containers/registries.conf
@@ -76,18 +61,31 @@ podman images
 REPOSITORY                            TAG         IMAGE ID      CREATED      SIZE
 registry.redhat.io/rhel9/mariadb-105  latest      beb17ebc4834  2 hours ago  489 MB
 
+podman inspect registry.redhat.io/rhel9/mariadb-105
+# search for user
+
+# or run a temporary container and check service uids
+podman run --it registry.redhat.io/rhel9/mariadb-105 /bin/sh
+cat /etc/passwd 
+
+uid=27(mysql) gid=27(mysql) groups=27(mysql),0(root)
+
+# rootless container so run user namespace
+podman unshare chown 27:27 /home/linda/mydb 
+podman unshare ls -ls /home/linda/mydb
+
+
 # run the container
 podman -d --name mariadb -v /home/linda/mydb:/var/lib/mysql:Z -e MYSQL_ROOT_PASSWORD=password registry.redhat.io/rhel9/mariadb-105
 
 CONTAINER ID  IMAGE                                        COMMAND     CREATED         STATUS                 PORTS       NAMES
 d6994353b063  registry.redhat.io/rhel9/mariadb-105:latest  run-mysqld  56 seconds ago  Up Less than a second  3306/tcp    mariadb
 
-podman inspect mariadb
-
+# confirm diretories have mounted
 cd mydb
 data  mysql.sock
 
-podman exec -it mariadb /bin/bash
+podman exec -it mariadb /bin/sh
 cd /var/lib/mysql
 data  mysql.sock
 
@@ -143,7 +141,7 @@ Linger=yes
 man podman-generate-systemd
 man podman-systemd.unit
 
-mkdir /home/linda/.config/systemd/user
+mkdir -p /home/linda/.config/systemd/user
 
 podman generate systemd --files --new --name mariadb
 
